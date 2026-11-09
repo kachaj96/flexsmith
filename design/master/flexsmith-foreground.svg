@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108" role="img" aria-labelledby="title">
+  <title id="title">Flexsmith adaptive icon foreground mark</title>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M26 48 C43 41 63 42 82 36" stroke-width="9.5"/>
+    <path d="M54 52 C50 60 44 68 33 84" stroke-width="10"/>
+    <path d="M54 52 C63 62 71 72 77 84" stroke-width="10"/>
+  </g>
+  <circle cx="54" cy="24" r="7.5" fill="#FFFFFF"/>
+</svg>

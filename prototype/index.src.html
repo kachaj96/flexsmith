@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="pl" data-smith-product="flexsmith">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Flexsmith: prototyp do akceptacji</title>
+<style>
+/*FONTS*/
+/* ===== Smith Design System v1 tokens (smith-design-system-v1/smith-tokens-v1.css) + Flexsmith product accent ===== */
+:root,[data-smith-theme="light"]{color-scheme:light;
+  --smith-bg:#f4f5f6;--smith-surface:#fff;--smith-surface-muted:#eef1f3;--smith-surface-elevated:#e3e7eb;--smith-text:#151a21;--smith-text-secondary:#56606d;
+  --smith-border-subtle:#e4e8ec;--smith-border-strong:#7e8893;--smith-positive:#22663d;--smith-positive-soft:#e2f2e8;--smith-danger:#b8322a;--smith-danger-soft:#fde7e4;
+  --smith-warning:#8f4f00;--smith-warning-soft:#fcefd9;--smith-glass:rgba(248,249,250,.78);--smith-scrim:rgba(18,22,27,.35);
+  --smith-shadow:0 1px 2px rgba(18,22,27,.04),0 12px 32px -14px rgba(18,22,27,.16);
+  --smith-font-display:"Manrope Variable",Manrope,Inter,system-ui,sans-serif;--smith-font-body:"Inter Variable",Inter,system-ui,Roboto,"Segoe UI",sans-serif;
+  --smith-radius-control:12px;--smith-radius-card:22px;--smith-radius-modal:24px;--smith-radius-pill:999px;
+  --smith-motion-fast:120ms;--smith-motion-standard:220ms;--smith-motion-deliberate:300ms;--smith-spring:cubic-bezier(.2,.9,.25,1.04);--smith-bouncy:cubic-bezier(.3,1.4,.5,1);
+  /* Flexsmith: the tile keeps the approved #8071B4 (graphic, white mark 4.25:1); text and buttons use a darker violet that passes 4.5:1 */
+  --smith-accent:#6a5ba0;--smith-accent-soft:#ece8f6;--smith-on-accent:#fff;--tile:#8071b4;
+  --t-prep:#a8620d;--t-mob:#1f6f5c;--t-stat:#4a63a8;--t-roll:#9a4a73;
+}
+[data-smith-theme="dark"]{color-scheme:dark;
+  --smith-bg:#0b0e11;--smith-surface:#161a1f;--smith-surface-muted:#20262d;--smith-surface-elevated:#2a3139;--smith-text:#e9edf1;--smith-text-secondary:#a3adb8;
+  --smith-border-subtle:#2a3139;--smith-border-strong:#6b7580;--smith-positive:#7fd39f;--smith-positive-soft:#16301f;--smith-danger:#ff9a8f;--smith-danger-soft:#43201d;
+  --smith-warning:#f2b866;--smith-warning-soft:#3a2a12;--smith-glass:rgba(20,24,29,.78);--smith-scrim:rgba(0,0,0,.55);
+  --smith-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 12px 32px -14px rgba(0,0,0,.6);
+  --smith-accent:#b3a6e6;--smith-accent-soft:#241f3a;--smith-on-accent:#14102a;
+  --t-prep:#e0a050;--t-mob:#5fc2a8;--t-stat:#8fa6e6;--t-roll:#e08fb8;
+}
+@media (prefers-reduced-motion:reduce){:root{--smith-motion-fast:0ms;--smith-motion-standard:0ms;--smith-motion-deliberate:0ms}}
+html[data-motion="reduce"]{--smith-motion-fast:0ms;--smith-motion-standard:0ms;--smith-motion-deliberate:0ms}
+/* ===== base ===== */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--smith-bg);color:var(--smith-text);font:16px/1.45 var(--smith-font-body)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--smith-accent);outline-offset:2px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#stage{min-height:100%;display:grid;place-items:center;background:var(--smith-bg)}
+#phone{position:relative;width:100%;max-width:430px;height:100vh;height:100dvh;overflow:hidden;background:var(--smith-bg);isolation:isolate}
+@media (min-width:600px){#stage{background:#d9dde2;padding:24px}[data-smith-theme="dark"]#stage{background:#050607}
+  #phone{height:860px;max-height:calc(100vh - 48px);border-radius:44px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45),0 0 0 10px #101317}}
+.scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(104px + env(safe-area-inset-bottom));scroll-padding-bottom:110px}
+.page{position:absolute;inset:0;background:var(--smith-bg);z-index:20;display:flex;flex-direction:column;animation:slide var(--smith-motion-deliberate) var(--smith-spring) both}
+.page .scroll{position:relative;inset:auto;flex:1;min-height:0;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+@keyframes slide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fade-in{animation:rise var(--smith-motion-standard) var(--smith-spring) both}
+/* ===== header, headings ===== */
+.hdr{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding-top:max(8px,env(safe-area-inset-top))}
+.lockup{display:flex;align-items:center;gap:10px}
+.lockup .mk{width:28px;height:28px;flex:none}
+.lockup b{font:800 20px/1 var(--smith-font-display);letter-spacing:-.01em}
+.ib{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--smith-text)}
+.ib:active{transform:scale(.94);transition:transform var(--smith-motion-fast)}
+.ib svg,.ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+h1{font:800 32px/1.1 var(--smith-font-display);letter-spacing:-.02em;margin:8px 0 2px}
+.sub{color:var(--smith-text-secondary);font-size:15px;margin:0 0 16px}
+h2{font:700 18px/1.3 var(--smith-font-display);margin:24px 0 10px}
+.cap{font-size:12px;line-height:16px;color:var(--smith-text-secondary)}
+/* ===== components ===== */
+.card{background:var(--smith-surface);border-radius:var(--smith-radius-card);box-shadow:var(--smith-shadow);padding:16px}
+.card+.card{margin-top:12px}
+.btn{min-height:48px;padding:0 20px;border-radius:var(--smith-radius-control);font:600 16px var(--smith-font-body);display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform var(--smith-motion-fast),background var(--smith-motion-standard)}
+.btn:active{transform:scale(.985)}
+.btn.pri{background:var(--smith-accent);color:var(--smith-on-accent);width:100%;min-height:52px}
+.btn.sec{background:var(--smith-surface-muted);color:var(--smith-text);min-height:44px}
+.btn.ghost{color:var(--smith-accent);min-height:44px}
+.btn.danger{background:var(--smith-danger-soft);color:var(--smith-danger)}
+.btn[disabled]{opacity:.5}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;background:var(--smith-surface);box-shadow:inset 0 0 0 1.5px var(--smith-border-subtle);font:600 14px var(--smith-font-body);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:background var(--smith-motion-standard),box-shadow var(--smith-motion-standard)}
+.chip[aria-pressed="true"]{background:var(--smith-accent-soft);color:var(--smith-accent);box-shadow:inset 0 0 0 1.5px var(--smith-accent)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 16px 10px;margin:0 -16px;scrollbar-width:none}
+.tag{display:inline-flex;align-items:center;gap:6px;min-height:24px;padding:0 10px;border-radius:999px;background:var(--smith-surface-muted);font:600 12px var(--smith-font-body);color:var(--smith-text)}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--smith-accent));display:block}
+.tag.sq i{border-radius:2px}.tag.di i{border-radius:2px;transform:rotate(45deg)}.tag.tr i{width:0;height:0;border-radius:0;background:none;border:5px solid transparent;border-bottom:8px solid var(--c);border-top:0}
+.field{width:100%;min-height:48px;border-radius:var(--smith-radius-control);background:var(--smith-surface);box-shadow:inset 0 0 0 1.5px var(--smith-border-strong);padding:0 14px;border:0}
+.field:focus{box-shadow:inset 0 0 0 2px var(--smith-accent);outline:none}
+.search{position:relative}.search .ico{position:absolute;left:14px;top:13px;color:var(--smith-text-secondary)}.search .field{padding-left:44px}
+.row{display:flex;align-items:center;gap:12px}
+.grow{flex:1;min-width:0}
+.met{font:800 28px/1 var(--smith-font-display);font-variant-numeric:tabular-nums}
+.notice{display:flex;gap:10px;padding:12px 14px;border-radius:16px;background:var(--smith-warning-soft);color:var(--smith-text);font-size:14px;line-height:20px}
+.notice .ico{flex:none;color:var(--smith-warning)}
+.notice.info{background:var(--smith-accent-soft)}.notice.info .ico{color:var(--smith-accent)}
+.li{width:100%;text-align:left;display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--smith-surface);border-radius:var(--smith-radius-card);box-shadow:var(--smith-shadow);margin-bottom:10px;min-height:64px;transition:transform var(--smith-motion-fast)}
+.li:active{transform:scale(.985)}
+.li .t{font:700 16px/1.3 var(--smith-font-display)}
+.li .m{font-size:13px;color:var(--smith-text-secondary)}
+.empty{text-align:center;padding:36px 16px;color:var(--smith-text-secondary)}
+.progress{height:8px;border-radius:99px;background:var(--smith-surface-muted);overflow:hidden}
+.progress>i{display:block;height:100%;width:0;background:var(--smith-accent);border-radius:99px;transition:width var(--smith-motion-standard) linear}
+/* ===== bottom nav ===== */
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--smith-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--smith-border-subtle)}
+.nav button{position:relative;min-height:56px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:500 12px var(--smith-font-body);color:var(--smith-text-secondary);z-index:0}
+.nav button[aria-current="page"]{color:var(--smith-accent);font-weight:700}
+.nav .pill{position:absolute;left:0;top:8px;height:56px;border-radius:18px;background:var(--smith-accent-soft);z-index:-1;transition:transform var(--smith-motion-deliberate) var(--smith-spring),width var(--smith-motion-deliberate) var(--smith-spring);pointer-events:none}
+/* ===== sheet ===== */
+.scrim{position:absolute;inset:0;background:var(--smith-scrim);z-index:40;animation:fade var(--smith-motion-standard) both}
+@keyframes fade{from{opacity:0}}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:41;max-height:88%;overflow-y:auto;background:var(--smith-surface);border-radius:var(--smith-radius-modal) var(--smith-radius-modal) 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom));animation:up var(--smith-motion-deliberate) var(--smith-spring) both}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h3{font:800 22px/1.2 var(--smith-font-display);margin:0 0 4px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+.toast{position:absolute;left:16px;right:16px;bottom:96px;z-index:60;background:var(--smith-text);color:var(--smith-bg);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;animation:rise var(--smith-motion-standard) var(--smith-spring) both;font-size:14px}
+.toast button{color:inherit;font-weight:700;text-decoration:underline;min-height:44px;padding:0 6px}
+/* ===== library / detail ===== */
+.media{aspect-ratio:16/10;border-radius:var(--smith-radius-card);background:linear-gradient(160deg,var(--smith-accent-soft),var(--smith-surface-muted));display:grid;place-items:center;text-align:center;padding:16px;color:var(--smith-text-secondary);font-size:13px;position:relative;overflow:hidden}
+.media svg{width:92px;height:92px;opacity:.9}
+.media .lab{position:absolute;left:12px;bottom:10px;right:12px;font-size:12px}
+.fav{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--smith-text-secondary)}
+.fav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2}
+.fav[aria-pressed="true"]{color:var(--smith-accent)}.fav[aria-pressed="true"] svg{fill:currentColor;animation:pop var(--smith-motion-deliberate) var(--smith-bouncy)}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.acc{border-radius:var(--smith-radius-card);background:var(--smith-surface);box-shadow:var(--smith-shadow);margin-top:10px;overflow:hidden}
+.acc>button{width:100%;min-height:56px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;font:700 16px var(--smith-font-display);text-align:left}
+.acc .chev{transition:transform var(--smith-motion-standard) var(--smith-spring)}
+.acc[data-open="true"] .chev{transform:rotate(90deg)}
+.acc .body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 220ms var(--smith-spring)}
+.acc[data-open="true"] .body{grid-template-rows:1fr}
+.acc .body>div{overflow:hidden}.acc .inner{padding:0 16px 16px}
+ol.steps{margin:0;padding-left:22px}ol.steps li{margin:6px 0}
+/* ===== builder ===== */
+.step{display:flex;align-items:center;gap:8px;padding:10px 10px 10px 14px;background:var(--smith-surface);border-radius:18px;box-shadow:var(--smith-shadow);margin-bottom:8px;animation:rise var(--smith-motion-standard) var(--smith-spring) both}
+.step .n{width:28px;height:28px;border-radius:50%;background:var(--smith-surface-muted);display:grid;place-items:center;font:700 13px var(--smith-font-display);flex:none}
+.stepper{display:inline-flex;align-items:center;background:var(--smith-surface-muted);border-radius:12px}
+.stepper button{width:36px;height:44px;font:700 18px var(--smith-font-display)}
+.stepper span{min-width:52px;text-align:center;font:700 14px var(--smith-font-display);font-variant-numeric:tabular-nums}
+.mini{width:36px;height:44px;display:grid;place-items:center;color:var(--smith-text-secondary)}
+.mini[disabled]{opacity:.3}
+/* ===== player ===== */
+#player{position:absolute;inset:0;z-index:30;background:var(--smith-bg);display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));animation:rise var(--smith-motion-deliberate) var(--smith-spring) both}
+.pl-top{display:flex;align-items:center;justify-content:space-between;min-height:52px}
+.pl-body{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-height:0}
+.pl-step{animation:swap var(--smith-motion-deliberate) var(--smith-spring) both}
+@keyframes swap{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.ring{position:relative;width:176px;height:176px;margin:0 auto;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:10}
+.ring .bg{stroke:var(--smith-surface-muted)}.ring .fg{stroke:var(--smith-accent);stroke-linecap:round}
+.ring .val{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .val b{font:800 46px/1 var(--smith-font-display);font-variant-numeric:tabular-nums}
+.ring .val span{font-size:13px;color:var(--smith-text-secondary)}
+.side{align-self:center;min-height:36px;padding:0 16px;border-radius:99px;background:var(--smith-accent-soft);color:var(--smith-accent);font:800 15px var(--smith-font-display);display:inline-flex;align-items:center}
+.ctl{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;gap:12px;margin-top:8px}
+.ctl .big{width:84px;height:84px;border-radius:50%;background:var(--smith-accent);color:var(--smith-on-accent);display:grid;place-items:center;transition:transform var(--smith-motion-fast) var(--smith-spring)}
+.ctl .big:active{transform:scale(.94)}
+.ctl .big svg{width:34px;height:34px;fill:currentColor;stroke:none}
+.ctl .sidebtn{min-height:56px;border-radius:18px;background:var(--smith-surface-muted);display:flex;align-items:center;justify-content:center;gap:6px;font:700 14px var(--smith-font-display)}
+.ctl2{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.check{width:84px;height:84px;margin:8px auto}
+.check circle{fill:none;stroke:var(--smith-positive);stroke-width:5;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .5s var(--smith-spring) forwards}
+.check path{fill:none;stroke:var(--smith-positive);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw .4s .3s var(--smith-spring) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+html[data-motion="reduce"] .check circle,html[data-motion="reduce"] .check path{animation:none;stroke-dashoffset:0}
+@media (prefers-reduced-motion:reduce){.check circle,.check path{animation:none;stroke-dashoffset:0}}
+/* ===== start screen (same timeline as Runsmith/Repsmith, docs/MOTION.md) ===== */
+#splash{position:absolute;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:22px;background:var(--smith-bg);transition:opacity .26s cubic-bezier(.4,0,.2,1)}
+#splash.out{opacity:0;pointer-events:none}
+#splash[hidden]{display:none}
+.sp-tile{width:120px;height:120px;display:block;animation:sp-tile .42s var(--smith-spring) both}
+.sp-rv{stroke-dasharray:1.05;stroke-dashoffset:1.05;animation:draw var(--t) var(--d) cubic-bezier(.4,0,.2,1) forwards}
+.sp-head{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:sp-head .3s .78s var(--smith-bouncy) forwards}
+.sp-name{margin:0;font:800 26px/1 var(--smith-font-display);letter-spacing:-.02em;opacity:0;animation:sp-name .3s .94s cubic-bezier(.2,0,0,1) forwards}
+.sp-end{position:absolute;width:0;height:0;animation:sp-end 1.6s linear both}
+@keyframes sp-tile{0%{opacity:0;transform:scale(.88)}35%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes sp-head{to{transform:scale(1)}}
+@keyframes sp-name{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sp-end{from{opacity:.99}to{opacity:1}}
+html[data-motion="reduce"] .sp-tile,html[data-motion="reduce"] .sp-name,html[data-motion="reduce"] .sp-rv,html[data-motion="reduce"] .sp-head,html[data-motion="reduce"] .sp-end{animation:none}
+html[data-motion="reduce"] .sp-rv{stroke-dashoffset:0}html[data-motion="reduce"] .sp-head{transform:none}html[data-motion="reduce"] .sp-name{opacity:1}
+@media (prefers-reduced-motion:reduce){.sp-tile,.sp-name,.sp-rv,.sp-head,.sp-end{animation:none}.sp-rv{stroke-dashoffset:0}.sp-head{transform:none}.sp-name{opacity:1}}
+.legend{position:fixed;left:12px;bottom:12px;font-size:12px;color:var(--smith-text-secondary);background:var(--smith-surface);padding:8px 12px;border-radius:12px;box-shadow:var(--smith-shadow);max-width:260px;z-index:200}
+@media (max-width:599px){.legend{display:none}}
+</style>
+</head>
+<body>
+<div id="stage"><div id="phone" aria-label="Flexsmith"></div></div>
+<div class="legend">Prototyp do akceptacji. Dane w przeglądarce (localStorage <code>flexsmith.proto</code>), bez sieci. Treści ćwiczeń do przeglądu, demonstracje wideo/wektorowe są w tym prototypie zastąpione ramką.</div>
+<script>
+'use strict';
+/* ================= data (prototype seed: real, reviewable content; production target is 35-50 entries with a QA manifest) ================= */
+const L = (pl, en) => ({ pl, en });
+const TYPES = {
+  prep: { c: 'var(--t-prep)', cls: '',   n: L('Dynamiczna', 'Dynamic'),        d: L('Ruch przygotowujący, bez długiego trzymania', 'Movement preparation, no long holds') },
+  mob:  { c: 'var(--t-mob)',  cls: 'di', n: L('Mobilność', 'Mobility'),        d: L('Kontrolowany ruch w zakresie', 'Controlled movement through range') },
+  stat: { c: 'var(--t-stat)', cls: 'sq', n: L('Statyczne', 'Static stretch'),  d: L('Spokojne wytrzymanie pozycji', 'A calm held position') },
+  roll: { c: 'var(--t-roll)', cls: 'tr', n: L('Rolowanie', 'Foam rolling'),    d: L('Opcjonalne, z wałkiem', 'Optional, with a roller') },
+};
+const AREAS = { ankles: L('Kostki', 'Ankles'), calves: L('Łydki', 'Calves'), hips: L('Biodra', 'Hips'), glutes: L('Pośladki', 'Glutes'), hams: L('Tył uda', 'Hamstrings'), quads: L('Przód uda', 'Quads'), thor: L('Odcinek piersiowy', 'Thoracic'), shoulders: L('Barki', 'Shoulders'), full: L('Całe ciało', 'Full body') };
+const EQ = { none: L('Bez sprzętu', 'No equipment'), mat: L('Mata', 'Mat'), roller: L('Wałek', 'Foam roller') };
+/* mode 'time': dur seconds (per side when sides); mode 'reps': reps (per side when sides), spr = seconds per rep for the estimate */
+const EX = [
+  { id: 'march', t: 'prep', a: 'full', eq: 'none', mode: 'time', dur: 30, sides: false, n: L('Marsz z unoszeniem kolan', 'Marching knee lifts'),
+    how: L('Rytmiczny marsz w miejscu, który podnosi tętno i uczy koordynacji przed biegiem.', 'Rhythmic marching in place that raises heart rate and coordination before a run.'),
+    steps: L(['Stań prosto, stopy na szerokość bioder.', 'Unoś kolano do wysokości bioder, przeciwna ręka idzie do przodu.', 'Utrzymaj lekki, równy rytm i wysoką sylwetkę.'], ['Stand tall, feet hip-width.', 'Lift a knee to hip height, opposite arm swings forward.', 'Keep an easy, even rhythm and a tall posture.']),
+    err: L(['Garbienie się i opadanie klatki.', 'Zbyt szybkie tempo kosztem kontroli.'], ['Slouching and a collapsing chest.', 'Going fast at the cost of control.']),
+    easy: L('Niżej unoś kolana.', 'Lift the knees lower.'), hard: L('Dodaj lekkie podskoki.', 'Add small hops.'),
+    caut: L('Przy bólu stopy lub kolana zmniejsz zakres albo przerwij.', 'If foot or knee hurts, reduce the range or stop.') },
+  { id: 'swingfb', t: 'prep', a: 'hips', eq: 'none', mode: 'time', dur: 20, sides: true, n: L('Wymachy nogi przód-tył', 'Front-to-back leg swings'),
+    how: L('Kontrolowane wymachy nogi, które stopniowo zwiększają zakres ruchu w stawie biodrowym.', 'Controlled leg swings that gradually raise hip range of motion.'),
+    steps: L(['Oprzyj dłoń o ścianę, stań na jednej nodze.', 'Wymachuj drugą nogą przód-tył, zakres zwiększaj stopniowo.', 'Tułów stabilny, ruch wychodzi z biodra.'], ['Rest a hand on a wall, stand on one leg.', 'Swing the other leg forward and back, build range gradually.', 'Keep the torso steady, the movement comes from the hip.']),
+    err: L(['Szarpanie nogą na pełny zakres od razu.', 'Wyginanie dolnego odcinka pleców.'], ['Jerking into full range at once.', 'Arching the lower back.']),
+    easy: L('Mniejszy zakres, więcej oparcia.', 'Smaller range, more support.'), hard: L('Większy zakres bez oparcia.', 'Bigger range with no support.'),
+    caut: L('Nie wymuszaj zakresu. Ostry ból w biodrze: przerwij.', 'Do not force range. Sharp hip pain: stop.') },
+  { id: 'rocks', t: 'mob', a: 'ankles', eq: 'none', mode: 'reps', dur: 8, spr: 4, sides: true, n: L('Kolano do ściany (kostka)', 'Ankle rocks (knee to wall)'),
+    how: L('Ćwiczenie na zgięcie grzbietowe stopy: kolano jedzie nad palce przy pięcie dociśniętej do podłoża.', 'Ankle dorsiflexion drill: the knee travels over the toes with the heel staying down.'),
+    steps: L(['Stań przodem do ściany, stopa 8-10 cm od niej.', 'Pchnij kolano w stronę ściany, pięta zostaje na ziemi.', 'Wróć i powtórz spokojnie. Odsuwaj stopę, gdy ruch jest łatwy.'], ['Face a wall, foot 8-10 cm from it.', 'Drive the knee toward the wall, heel stays down.', 'Return and repeat calmly. Move the foot back as it gets easy.']),
+    err: L(['Unoszenie pięty.', 'Kolano zapada się do środka.'], ['Lifting the heel.', 'Knee collapsing inward.']),
+    easy: L('Stopa bliżej ściany.', 'Foot closer to the wall.'), hard: L('Stopa dalej od ściany.', 'Foot further from the wall.'),
+    caut: L('Ostry ból z przodu kostki: zmniejsz zakres.', 'Sharp pain at the front of the ankle: reduce range.') },
+  { id: 'calfraise', t: 'prep', a: 'calves', eq: 'none', mode: 'reps', dur: 12, spr: 3, sides: false, n: L('Dynamiczne wspięcia na palce', 'Dynamic calf raises'),
+    how: L('Szybkie, kontrolowane wspięcia budzące łydki i ścięgno Achillesa przed biegiem.', 'Quick, controlled raises that wake the calves and Achilles before a run.'),
+    steps: L(['Stań na całych stopach.', 'Wspinaj się na palce i opuszczaj pięty bez gwałtownego uderzenia.', 'Utrzymaj stały rytm.'], ['Stand flat on both feet.', 'Rise onto the toes and lower the heels without slamming.', 'Keep a steady rhythm.']),
+    err: L(['Opadanie z impetem.', 'Rozjeżdżanie kostek na boki.'], ['Dropping with momentum.', 'Ankles rolling outward.']),
+    easy: L('Trzymaj się ściany.', 'Hold a wall.'), hard: L('Na jednej nodze.', 'On one leg.'),
+    caut: L('Ból ścięgna Achillesa: przerwij i nie zastępuj ćwiczeniem rozciągania.', 'Achilles pain: stop, do not swap in a stretch.') },
+  { id: 'lungerot', t: 'prep', a: 'hips', eq: 'none', mode: 'reps', dur: 5, spr: 6, sides: true, n: L('Wykrok z rotacją tułowia', 'Lunge with rotation'),
+    how: L('Wykrok z otwarciem klatki piersiowej: biodra, odcinek piersiowy i łydki w jednym ruchu.', 'A lunge with a chest opening: hips, thoracic spine and calves in one flow.'),
+    steps: L(['Zrób wykrok do przodu, tułów prosty.', 'Dłoń po stronie nogi z tyłu na podłoże, drugą rękę unieś w stronę sufitu.', 'Wróć i wstań, zmień nogę.'], ['Step into a forward lunge, torso tall.', 'Hand on the floor on the back-leg side, other arm reaches to the ceiling.', 'Return, stand, switch legs.']),
+    err: L(['Przód kolana zapada się do środka.', 'Skręt z lędźwi zamiast z klatki.'], ['Front knee collapsing inward.', 'Twisting from the lower back instead of the chest.']),
+    easy: L('Krótszy krok, mniej rotacji.', 'Shorter step, less rotation.'), hard: L('Dłuższy krok, wolniejszy ruch.', 'Longer step, slower tempo.'),
+    caut: L('Przy bólu kolana skróć krok.', 'If the knee hurts, shorten the step.') },
+  { id: 'openbook', t: 'mob', a: 'thor', eq: 'mat', mode: 'reps', dur: 8, spr: 5, sides: true, n: L('Otwarta książka', 'Open book'),
+    how: L('Rotacja odcinka piersiowego w leżeniu bokiem, miednica stabilna.', 'Thoracic rotation lying on the side with a stable pelvis.'),
+    steps: L(['Połóż się na boku, kolana zgięte, ręce przed sobą.', 'Górną ręką otwórz klatkę, wzrok za dłonią.', 'Wróć powoli.'], ['Lie on your side, knees bent, arms in front.', 'Open the chest with the top arm, eyes follow the hand.', 'Return slowly.']),
+    err: L(['Kolana odjeżdżają od siebie.', 'Wymuszanie rotacji barkiem.'], ['Knees drifting apart.', 'Forcing rotation with the shoulder.']),
+    easy: L('Mniejszy zakres.', 'Smaller range.'), hard: L('Dłuższy oddech na końcu zakresu.', 'Longer breath at the end of range.'),
+    caut: L('Ból barku: zmniejsz zakres.', 'Shoulder pain: reduce range.') },
+  { id: 'h9090', t: 'mob', a: 'hips', eq: 'mat', mode: 'reps', dur: 6, spr: 5, sides: false, n: L('Przejścia 90/90', '90/90 transitions'),
+    how: L('Kontrolowana rotacja obu bioder: przechodzisz z jednej strony na drugą w siadzie.', 'Controlled rotation of both hips: you switch sides while seated.'),
+    steps: L(['Usiądź, oba kolana zgięte pod kątem 90 stopni w jedną stronę.', 'Obróć kolana na drugą stronę, tułów prosty.', 'Ruch powolny, ręce pomagają w równowadze.'], ['Sit with both knees bent to 90 degrees toward one side.', 'Rotate the knees to the other side, torso tall.', 'Move slowly, hands help with balance.']),
+    err: L(['Pomoc rękami zamiast bioder.', 'Zaokrąglanie pleców.'], ['Pushing with the hands instead of hips.', 'Rounding the back.']),
+    easy: L('Podłóż poduszkę pod pośladek.', 'Sit on a cushion.'), hard: L('Oderwij ręce od podłoża.', 'Lift the hands off the floor.'),
+    caut: L('Ból w kolanie: przerwij, nie dociskaj kolan ręką.', 'Knee pain: stop, do not push the knees with your hands.') },
+  { id: 'hipflex', t: 'stat', a: 'hips', eq: 'mat', mode: 'time', dur: 40, sides: true, n: L('Rozciąganie zginaczy biodra', 'Hip flexor stretch'),
+    how: L('Klęk jednonóż: delikatne rozciągnięcie przodu biodra po bieganiu lub siedzeniu.', 'Half-kneeling: a gentle stretch of the front of the hip after running or sitting.'),
+    steps: L(['Klęk jednonóż, mata pod kolanem.', 'Podwiń miednicę i przesuń ciężar lekko do przodu.', 'Oddychaj spokojnie, odczuwaj łagodne rozciąganie.'], ['Half-kneel with a mat under the knee.', 'Tuck the pelvis and shift the weight slightly forward.', 'Breathe calmly, feel a mild stretch.']),
+    err: L(['Wygięcie lędźwi zamiast podwinięcia miednicy.', 'Zbyt mocne dociskanie.'], ['Arching the lower back instead of tucking.', 'Pushing too hard.']),
+    easy: L('Mniejsze przesunięcie do przodu.', 'Smaller forward shift.'), hard: L('Unieś ramię po stronie kolana.', 'Raise the arm on the kneeling side.'),
+    caut: L('To ma być łagodne. Nie przed maksymalnym wysiłkiem siłowym ani sprintem.', 'Keep it mild. Not before maximal strength work or sprinting.') },
+  { id: 'calfst', t: 'stat', a: 'calves', eq: 'none', mode: 'time', dur: 40, sides: true, n: L('Rozciąganie łydki przy ścianie', 'Wall calf stretch'),
+    how: L('Spokojne rozciągnięcie łydki po biegu.', 'A calm calf stretch after a run.'),
+    steps: L(['Ręce na ścianie, jedna noga z tyłu, pięta na ziemi.', 'Zegnij przednie kolano, aż poczujesz łagodne rozciąganie łydki.', 'Oddychaj, nie podskakuj.'], ['Hands on a wall, one leg back, heel down.', 'Bend the front knee until you feel a mild calf stretch.', 'Breathe, do not bounce.']),
+    err: L(['Pięta odrywa się od podłoża.', 'Podskakiwanie.'], ['Heel lifts off the floor.', 'Bouncing.']),
+    easy: L('Krótszy krok.', 'Shorter step.'), hard: L('Zegnij tylne kolano dla głębszej części łydki.', 'Bend the back knee for the deeper calf muscle.'),
+    caut: L('Ból w ścięgnie Achillesa: zmniejsz zakres lub przerwij.', 'Achilles pain: reduce range or stop.') },
+  { id: 'hamst', t: 'stat', a: 'hams', eq: 'none', mode: 'time', dur: 30, sides: true, n: L('Rozciąganie tyłu uda', 'Hamstring stretch'),
+    how: L('Noga wyprostowana na podwyższeniu, tułów pochylony od bioder.', 'Leg straight on a low support, torso hinging from the hips.'),
+    steps: L(['Pięta na niskim stopniu, kolano prawie proste.', 'Pochyl się od bioder z prostymi plecami.', 'Zatrzymaj się przy łagodnym naciągu.'], ['Heel on a low step, knee nearly straight.', 'Hinge from the hips with a flat back.', 'Stop at a mild stretch.']),
+    err: L(['Zaokrąglone plecy.', 'Pełny zakres od razu.'], ['Rounded back.', 'Going full range at once.']),
+    easy: L('Niższy stopień, zgięte kolano.', 'Lower step, bent knee.'), hard: L('Wyższe podparcie.', 'Higher support.'),
+    caut: L('Ból lub mrowienie z tyłu nogi: przerwij.', 'Pain or tingling down the back of the leg: stop.') },
+  { id: 'fig4', t: 'stat', a: 'glutes', eq: 'none', mode: 'time', dur: 40, sides: true, n: L('Rozciąganie pośladka (czwórka)', 'Figure-4 glute stretch'),
+    how: L('W staniu lub leżeniu: kostka na kolanie, delikatne rozciąganie pośladka.', 'Standing or lying: ankle on knee, a gentle glute stretch.'),
+    steps: L(['Połóż kostkę na przeciwnym kolanie.', 'Usiądź w tył jak na krześle lub przyciągnij nogę do siebie.', 'Plecy proste, spokojny oddech.'], ['Place an ankle on the opposite knee.', 'Sit back like into a chair or pull the leg toward you.', 'Flat back, calm breathing.']),
+    err: L(['Zaokrąglone plecy.', 'Dociskanie kolana ręką.'], ['Rounded back.', 'Pushing the knee with a hand.']),
+    easy: L('Wersja stojąca przy ścianie.', 'Standing version near a wall.'), hard: L('Głębiej w tył.', 'Sit further back.'),
+    caut: L('Ból w kolanie: przerwij.', 'Knee pain: stop.') },
+  { id: 'doorway', t: 'stat', a: 'shoulders', eq: 'none', mode: 'time', dur: 30, sides: false, n: L('Rozciąganie klatki w drzwiach', 'Doorway chest stretch'),
+    how: L('Łagodne otwarcie klatki i przodu barku po pracy przy biurku.', 'A gentle opening of the chest and front shoulders after desk work.'),
+    steps: L(['Przedramię na futrynie, łokieć na wysokości barku.', 'Zrób mały krok do przodu.', 'Barki w dół, oddychaj.'], ['Forearm on the door frame, elbow at shoulder height.', 'Take a small step forward.', 'Shoulders down, breathe.']),
+    err: L(['Wygięcie lędźwi.', 'Zbyt wysoki łokieć.'], ['Arching the lower back.', 'Elbow too high.']),
+    easy: L('Łokieć niżej.', 'Elbow lower.'), hard: L('Dłuższy krok.', 'Longer step.'),
+    caut: L('Mrowienie w dłoni: przerwij.', 'Tingling in the hand: stop.') },
+  { id: 'catcow', t: 'mob', a: 'thor', eq: 'mat', mode: 'reps', dur: 8, spr: 4, sides: false, n: L('Koci grzbiet', 'Cat-cow'),
+    how: L('Naprzemienne zaokrąglanie i wyginanie kręgosłupa w podporze klęcznym.', 'Alternately rounding and extending the spine on all fours.'),
+    steps: L(['Podpór klęczny, ręce pod barkami.', 'Wydech: zaokrąglij plecy. Wdech: delikatnie wygnij.', 'Ruch płynny, bez dociskania na końcu zakresu.'], ['On all fours, hands under shoulders.', 'Exhale: round the back. Inhale: gently extend.', 'Move smoothly, no forcing at the end of range.']),
+    err: L(['Zbyt duży ruch w lędźwiach.', 'Wstrzymywanie oddechu.'], ['Too much movement in the lower back.', 'Holding the breath.']),
+    easy: L('Mniejszy zakres.', 'Smaller range.'), hard: L('Wolniej, z pauzą na końcach.', 'Slower, with pauses at the ends.'),
+    caut: L('Ból w nadgarstkach: oprzyj się na pięściach lub przedramionach.', 'Wrist pain: use fists or forearms.') },
+  { id: 'rollcalf', t: 'roll', a: 'calves', eq: 'roller', mode: 'time', dur: 45, sides: true, n: L('Rolowanie łydki', 'Calf rolling'),
+    how: L('Powolne przetaczanie łydki po wałku. Daje krótkotrwałe uczucie rozluźnienia, nie "rozbija" tkanek.', 'Slow rolling of the calf on a roller. It can feel relaxing for a while, it does not "break up" tissue.'),
+    steps: L(['Usiądź, wałek pod łydką, ręce za sobą.', 'Przetaczaj powoli od kostki do podkolanowej części łydki.', 'Zatrzymaj się na wrażliwym miejscu na kilka oddechów.'], ['Sit with the roller under the calf, hands behind you.', 'Roll slowly from ankle toward the back of the knee.', 'Pause on a tender spot for a few breaths.']),
+    err: L(['Toczenie po stawie lub ścięgnie Achillesa.', 'Zbyt duży nacisk.'], ['Rolling over the joint or the Achilles.', 'Too much pressure.']),
+    easy: L('Mniejszy nacisk, druga noga zostaje na podłożu.', 'Less pressure, keep the other foot down.'), hard: L('Druga noga na wierzchu.', 'Cross the other leg on top.'),
+    caut: L('Nie rolować po kości, stawie ani świeżej kontuzji. Ostry ból: przerwij. To ćwiczenie opcjonalne.', 'Do not roll over bone, a joint or a fresh injury. Sharp pain: stop. Optional.') },
+  { id: 'rollquad', t: 'roll', a: 'quads', eq: 'roller', mode: 'time', dur: 45, sides: true, n: L('Rolowanie przodu uda', 'Quad rolling'),
+    how: L('Przetaczanie przodu uda w podporze na przedramionach, w spokojnym tempie.', 'Rolling the front of the thigh in a forearm plank at an easy pace.'),
+    steps: L(['Podpór na przedramionach, wałek pod udem.', 'Przetaczaj od kolana (nie po rzepce) do biodra.', 'Oddychaj, nacisk reguluj ciężarem ciała.'], ['Forearm plank with the roller under the thigh.', 'Roll from above the knee (not over the kneecap) to the hip.', 'Breathe, adjust pressure with body weight.']),
+    err: L(['Toczenie po rzepce.', 'Zapadanie lędźwi.'], ['Rolling over the kneecap.', 'Sagging lower back.']),
+    easy: L('Druga stopa na podłożu odciąża.', 'Other foot on the floor takes weight.'), hard: L('Obie nogi na wałku.', 'Both legs on the roller.'),
+    caut: L('Nie po stawie kolanowym. Ostry ból: przerwij.', 'Not over the knee joint. Sharp pain: stop.') },
+  { id: 'rollback', t: 'roll', a: 'thor', eq: 'roller', mode: 'time', dur: 45, sides: false, n: L('Rolowanie górnej części pleców', 'Upper back rolling'),
+    how: L('Delikatne przetaczanie okolicy między łopatkami. Nie rolujemy szyi ani lędźwi.', 'Gentle rolling between the shoulder blades. Never the neck or the lower back.'),
+    steps: L(['Połóż się z wałkiem pod łopatkami, kolana zgięte.', 'Skrzyżuj ręce na klatce, unieś miednicę.', 'Przetaczaj krótkimi ruchami, bez wchodzenia na lędźwia.'], ['Lie with the roller under the shoulder blades, knees bent.', 'Cross your arms on the chest, lift the hips.', 'Roll in short strokes, never onto the lower back.']),
+    err: L(['Rolowanie szyi lub lędźwi.', 'Rzucanie głową w tył.'], ['Rolling the neck or lower back.', 'Throwing the head back.']),
+    easy: L('Mniejsze uniesienie miednicy.', 'Less hip lift.'), hard: L('Ręce za głową, głowę podpieraj.', 'Hands behind the head, support it.'),
+    caut: L('Nigdy po szyi, kręgosłupie lędźwiowym ani po żebrach. Przy zawrotach głowy lub drętwieniu przerwij.', 'Never on the neck, lower spine or ribs. Dizziness or numbness: stop.') },
+];
+const exById = id => EX.find(e => e.id === id);
+const sec = e => e.mode === 'time' ? e.dur : e.dur * (e.spr || 4);
+/* routine step: { ex, dur?, sides? } dur = seconds or reps override */
+const S = (ex, dur) => ({ ex, dur });
+const SESSIONS = [
+  { id: 'prerun', intent: 'prep', n: L('Przed biegiem', 'Before a run'), d: L('Podnosi tętno i budzi kostki, biodra i łydki. Bez długich rozciągań statycznych.', 'Raises heart rate and wakes ankles, hips and calves. No long static stretches.'), steps: [S('march'), S('swingfb'), S('rocks'), S('calfraise'), S('lungerot')] },
+  { id: 'prestrength', intent: 'prep', n: L('Przed siłownią', 'Before strength'), d: L('Biodra, odcinek piersiowy i kostki przed przysiadem lub martwym ciągiem.', 'Hips, thoracic spine and ankles before squats or deadlifts.'), steps: [S('march', 20), S('h9090'), S('openbook'), S('lungerot'), S('rocks')] },
+  { id: 'warm10', intent: 'prep', n: L('Rozgrzewka całego ciała', 'Full-body warm-up'), d: L('Dłuższa, ogólna rozgrzewka.', 'A longer, general warm-up.'), steps: [S('march'), S('swingfb'), S('catcow'), S('openbook'), S('lungerot'), S('rocks'), S('calfraise')] },
+  { id: 'postrun', intent: 'wind', n: L('Po biegu: wyciszenie', 'After a run: wind-down'), d: L('Spokojne, krótkie rozciąganie łydek, bioder i tyłu uda. Dla komfortu, nie "wypłukiwania kwasu mlekowego".', 'Calm, short stretching of calves, hips and hamstrings. For comfort, not for "flushing lactic acid".'), steps: [S('calfst'), S('hipflex'), S('hamst'), S('fig4')] },
+  { id: 'hips', intent: 'mob', n: L('Mobilność bioder', 'Hip mobility'), d: L('Rotacja i zakres w biodrach, na macie.', 'Hip rotation and range on a mat.'), steps: [S('h9090'), S('hipflex'), S('lungerot'), S('catcow'), S('fig4')] },
+  { id: 'desk', intent: 'mob', n: L('Przerwa od siedzenia', 'Desk break'), d: L('Pięć minut ruchu bez sprzętu i bez przebierania się.', 'Five minutes of movement with no equipment and no change of clothes.'), steps: [S('march'), S('doorway'), S('calfraise'), S('swingfb', 15)] },
+  { id: 'rolllegs', intent: 'roll', n: L('Rolowanie nóg', 'Leg rolling'), d: L('Opcjonalne rolowanie łydek i ud, na końcu krótkie rozciąganie.', 'Optional rolling of calves and quads, short stretch at the end.'), steps: [S('rollcalf'), S('rollquad'), S('calfst', 30)] },
+  { id: 'rollback', intent: 'roll', n: L('Rolowanie górnej części pleców', 'Upper-back rolling'), d: L('Łagodne rolowanie okolicy łopatek i otwarcie klatki.', 'Gentle rolling around the shoulder blades and a chest opening.'), steps: [S('rollback'), S('doorway'), S('catcow')] },
+];
+const INTENTS = { prep: L('Przygotuj', 'Prepare'), wind: L('Wycisz', 'Unwind'), mob: L('Popraw ruchomość', 'Improve'), roll: L('Rolowanie', 'Roll') };
+const TRANS = 5;
+const phases = steps => steps.flatMap((s, i) => { const e = exById(s.ex); const v = s.dur ?? e.dur; const sides = s.sides ?? e.sides;
+  return (sides ? ['L', 'R'] : [null]).map(side => ({ i, ex: e.id, side, mode: e.mode, val: v, spr: e.spr || 4, last: false })); });
+const phaseSec = p => p.mode === 'time' ? p.val : p.val * p.spr;
+const estimate = steps => { const ph = phases(steps); const work = ph.reduce((a, p) => a + phaseSec(p), 0); const tr = Math.max(0, ph.length - 1) * TRANS; return { ph: ph.length, work, tr, total: work + tr }; };
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const mins = s => Math.max(1, Math.round(s / 60));
+
+/* ================= i18n of the UI chrome ================= */
+const T = {
+  pl: { nav_today: 'Dziś', nav_sessions: 'Sesje', nav_mine: 'Moje', nav_lib: 'Biblioteka', nav_more: 'Więcej', today: 'Dziś', start: 'Zacznij zalecaną sesję', why: 'Na podstawie: cel „{g}", {m} min, {e}.', whyFallback: 'Brak sesji o celu „{g}" w {m} min: pokazuję najkrótszą z tej grupy.', adjust: 'Dopasuj', continue: 'Dokończ sesję', resume: 'Wznów', quick: 'Szybki start', recent: 'Ostatnio', week: 'Ten tydzień', weekN: '{n} sesji · {m} min', weekNone: 'Jeszcze nic w tym tygodniu.', explore: 'Przeglądaj', sessions: 'Sesje', search: 'Szukaj', all: 'Wszystkie', mine: 'Moje sesje', newS: 'Nowa sesja', lib: 'Biblioteka', exN: '{n} ćwiczeń', min: 'min', sec: 's', perSide: 'na stronę', reps: 'powt.', more: 'Więcej', theme: 'Motyw', sys: 'Systemowy', light: 'Jasny', dark: 'Ciemny', lang: 'Język', motion: 'Ruch', motionSys: 'Wg systemu', motionOff: 'Ogranicz', sound: 'Sygnał dźwiękowy', haptic: 'Wibracja', history: 'Historia', backup: 'Kopia zapasowa', export: 'Eksportuj JSON', replay: 'Pokaż animację startu', about: 'O aplikacji', disclaimer: 'Flexsmith to ogólna aplikacja ruchowa. Nie diagnozuje i nie zastępuje fizjoterapeuty ani lekarza. Przy ostrym, narastającym bólu lub objawach neurologicznych (drętwienie, osłabienie) przerwij i skonsultuj się ze specjalistą.', startS: 'Zacznij', save: 'Zapisz', cancel: 'Anuluj', done: 'Gotowe', pause: 'Pauza', resumeB: 'Wznów', next: 'Dalej', prev: 'Wstecz', swap: 'Zamień', finishEarly: 'Zakończ', nextUp: 'Dalej', goal: 'Cel', time: 'Czas', equip: 'Sprzęt', undo: 'Cofnij', removed: 'Usunięto ćwiczenie', add: 'Dodaj ćwiczenie', total: 'Razem', calc: '{w} ćwiczeń i stron: {work} + {n} przejść × {t} s', name: 'Nazwa', duplicate: 'Duplikuj', del: 'Usuń', delQ: 'Usunąć „{n}"? Zapisane w historii sesje zostają.', mistakes: 'Typowe błędy', instr: 'Instrukcja', easier: 'Łatwiej', harder: 'Trudniej', caution: 'Uwaga', mediaNote: 'Tu pojawi się własna, wektorowa demonstracja ruchu. W prototypie: ramka.', fav: 'Ulubione', favs: 'Ulubione', complete: 'Sesja zakończona', partial: 'Sesja przerwana', planned: 'Plan', actual: 'Faktycznie', comfort: 'Jak się czuło?', cOk: 'Komfortowo', cMid: 'Dość mocno', cBad: 'Dyskomfort', note: 'Notatka (opcjonalnie)', modified: 'Zmieniałem ćwiczenia', empty: 'Brak wyników. Zmień filtry.', noHist: 'Brak zapisanych sesji.', skipNow: 'Pomiń na razie', switchSide: 'Zmiana strony', left: 'Lewa', right: 'Prawa', tapDone: 'Gotowe', repsLeft: 'powtórzeń', ready: 'Do zrobienia', stopPain: 'Ostry ból: przerwij.', adaptSec: 'Czas ćwiczenia', onlyLocal: 'Dane zapisane tylko na tym urządzeniu.', exportOk: 'Plik przygotowany.', noMat: 'Wymaga maty', replaceIf: 'Zamiennik', noAlt: 'Brak zamiennika przy Twoim sprzęcie.', copyOf: 'Kopia: ', mineEmpty: 'Nie masz jeszcze własnych sesji.', makeCopy: 'Dostosuj kopię', routineSaved: 'Zapisano sesję', addTo: 'Dodaj do sesji', pick: 'Wybierz sesję', closeLbl: 'Zamknij', backLbl: 'Wróć', settings: 'Ustawienia', sessionSteps: 'Ćwiczenia', stepN: 'Ćwiczenie {i} z {n}', secLeft: 'sekund', side: 'Strona', duration: 'Czas', counts: 'Czas wg planu liczy powtórzenia po {s} s.' },
+  en: { nav_today: 'Today', nav_sessions: 'Sessions', nav_mine: 'Mine', nav_lib: 'Library', nav_more: 'More', today: 'Today', start: 'Start recommended session', why: 'Based on: goal "{g}", {m} min, {e}.', whyFallback: 'No "{g}" session fits {m} min: showing the shortest in that group.', adjust: 'Adjust', continue: 'Continue session', resume: 'Resume', quick: 'Quick start', recent: 'Recent', week: 'This week', weekN: '{n} sessions · {m} min', weekNone: 'Nothing yet this week.', explore: 'Explore', sessions: 'Sessions', search: 'Search', all: 'All', mine: 'My sessions', newS: 'New session', lib: 'Library', exN: '{n} exercises', min: 'min', sec: 's', perSide: 'per side', reps: 'reps', more: 'More', theme: 'Theme', sys: 'System', light: 'Light', dark: 'Dark', lang: 'Language', motion: 'Motion', motionSys: 'System', motionOff: 'Reduce', sound: 'Sound cue', haptic: 'Vibration', history: 'History', backup: 'Backup', export: 'Export JSON', replay: 'Replay start animation', about: 'About', disclaimer: 'Flexsmith is a general movement app. It does not diagnose and does not replace a physiotherapist or doctor. For sharp, worsening pain or neurological symptoms (numbness, weakness) stop and see a professional.', startS: 'Start', save: 'Save', cancel: 'Cancel', done: 'Done', pause: 'Pause', resumeB: 'Resume', next: 'Next', prev: 'Back', swap: 'Swap', finishEarly: 'Finish', nextUp: 'Up next', goal: 'Goal', time: 'Time', equip: 'Equipment', undo: 'Undo', removed: 'Exercise removed', add: 'Add exercise', total: 'Total', calc: '{w} exercises and sides: {work} + {n} transitions × {t} s', name: 'Name', duplicate: 'Duplicate', del: 'Delete', delQ: 'Delete "{n}"? Sessions saved in history stay.', mistakes: 'Common mistakes', instr: 'Instructions', easier: 'Easier', harder: 'Harder', caution: 'Caution', mediaNote: 'A custom vector demonstration goes here. In the prototype: a frame.', fav: 'Favourite', favs: 'Favourites', complete: 'Session complete', partial: 'Session ended early', planned: 'Planned', actual: 'Actual', comfort: 'How did it feel?', cOk: 'Comfortable', cMid: 'Fairly strong', cBad: 'Discomfort', note: 'Note (optional)', modified: 'I changed exercises', empty: 'No results. Change the filters.', noHist: 'No saved sessions yet.', skipNow: 'Skip for now', switchSide: 'Switch sides', left: 'Left', right: 'Right', tapDone: 'Done', repsLeft: 'reps', ready: 'To do', stopPain: 'Sharp pain: stop.', adaptSec: 'Exercise time', onlyLocal: 'Data is stored on this device only.', exportOk: 'File prepared.', noMat: 'Needs a mat', replaceIf: 'Alternative', noAlt: 'No alternative for your equipment.', copyOf: 'Copy: ', mineEmpty: 'You have no sessions of your own yet.', makeCopy: 'Customise a copy', routineSaved: 'Session saved', addTo: 'Add to session', pick: 'Choose a session', closeLbl: 'Close', backLbl: 'Back', settings: 'Settings', sessionSteps: 'Exercises', stepN: 'Exercise {i} of {n}', secLeft: 'seconds', side: 'Side', duration: 'Time', counts: 'Planned time counts reps at {s} s each.' },
+};
+/* ================= state ================= */
+const KEY = 'flexsmith.proto';
+const DEF = { lang: 'pl', theme: 'system', motion: 'system', sound: false, haptic: false, goal: 'prep', time: 10, equip: ['none', 'mat'], favs: ['rocks'], hist: [], routines: [
+  { id: 'r1', n: 'Poranny start', steps: [S('catcow'), S('openbook'), S('h9090'), S('calfraise')] }], paused: null };
+let st; try { st = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch { st = { ...DEF }; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch {} };
+const tr = (k, v = {}) => (T[st.lang][k] ?? k).replace(/\{(\w+)\}/g, (_, x) => v[x] ?? '');
+const nm = o => o[st.lang];
+let ui = { tab: 'today', page: null, sheet: null, filt: { q: '', intent: 'all' }, lib: { q: '', type: 'all', fav: false }, toast: null, ed: null };
+const $ = s => document.querySelector(s);
+const phone = $('#phone');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+/* ================= icons (Smith set + Flexsmith additions, 24px, stroke 2) ================= */
+const IC = { today: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', sessions: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/>', mine: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>', lib: '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>', more: '<circle cx="5" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.8" fill="currentColor" stroke="none"/>',
+  settings: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>', back: '<path d="M15 18l-6-6 6-6"/>', chev: '<path d="M9 18l6-6-6-6"/>', plus: '<path d="M12 5v14M5 12h14"/>', close: '<path d="M18 6L6 18M6 6l12 12"/>', info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>', history: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/><path d="M12 8v4l3 2"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>', up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>', heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>', swap: '<path d="M7 7h11l-3-3M17 17H6l3 3"/>', skip: '<path d="M6 5l9 7-9 7zM18 5v14"/>', skipb: '<path d="M18 5l-9 7 9 7zM6 5v14"/>', warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>', copy: '<rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>', play: '<path d="M8 5l11 7-11 7z"/>' };
+const ico = (n, cls = 'ico') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const MARK = '<path d="M26 48 C43 41 63 42 82 36" stroke-width="9.5"/><path d="M54 52 C50 60 44 68 33 84" stroke-width="10"/><path d="M54 52 C63 62 71 72 77 84" stroke-width="10"/>';
+const markSvg = `<svg class="mk" viewBox="0 0 108 108" aria-hidden="true"><rect width="108" height="108" rx="26" fill="var(--tile)"/><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">${MARK}</g><circle cx="54" cy="24" r="7.5" fill="#fff"/></svg>`;
+/* ================= helpers ================= */
+const tag = k => { const t = TYPES[k]; return `<span class="tag ${t.cls}" style="--c:${t.c}"><i></i>${esc(nm(t.n))}</span>`; };
+const eqOk = e => e.eq === 'none' || st.equip.includes(e.eq);
+const sessEq = s => [...new Set(s.steps.map(x => exById(x.ex).eq).filter(x => x !== 'none'))];
+const sessOk = s => sessEq(s).every(q => st.equip.includes(q));
+const dur = s => estimate(s.steps).total;
+function recommend() {
+  const cap = st.time * 60;
+  let pool = SESSIONS.filter(s => s.intent === st.goal && sessOk(s));
+  const fit = pool.filter(s => dur(s) <= cap + 30).sort((a, b) => dur(b) - dur(a) || a.id.localeCompare(b.id));
+  if (fit.length) return { s: fit[0], fb: false };
+  pool = pool.sort((a, b) => dur(a) - dur(b) || a.id.localeCompare(b.id));
+  return pool.length ? { s: pool[0], fb: true } : { s: null, fb: true };
+}
+const metaOf = e => `${e.mode === 'time' ? e.dur + ' ' + tr('sec') : e.dur + ' ' + tr('reps')}${e.sides ? ' · ' + tr('perSide') : ''}`;
+const sessCard = s => `<button class="li" data-a="session" data-id="${s.id}"><div class="grow"><div class="t">${esc(nm(s.n))}</div><div class="m">${mins(dur(s))} ${tr('min')} · ${tr('exN', { n: s.steps.length })} · ${esc(sessEq(s).length ? sessEq(s).map(q => nm(EQ[q])).join(', ') : nm(EQ.none))}</div><div style="margin-top:6px">${tag(s.intent === 'wind' ? 'stat' : s.intent)}</div></div>${ico('chev')}</button>`;
+const routineAsSession = r => ({ id: r.id, intent: 'mine', n: L(r.n, r.n), d: L('', ''), steps: r.steps, mine: true });
+/* ================= rendering ================= */
+function applyTheme() {
+  const dark = st.theme === 'dark' || (st.theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.dataset.smithTheme = dark ? 'dark' : 'light';
+  document.getElementById('stage').dataset.smithTheme = dark ? 'dark' : 'light';
+  document.documentElement.lang = st.lang;
+  if (st.motion === 'off') document.documentElement.dataset.motion = 'reduce'; else delete document.documentElement.dataset.motion;
+}
+function header(right = '') { return `<div class="hdr"><div class="lockup">${markSvg}<b>Flexsmith</b></div><div>${right}</div></div>`; }
+function viewToday() {
+  const rec = recommend(); const s = rec.s;
+  const wk = st.hist.filter(h => Date.now() - h.at < 7 * 864e5); const wm = wk.reduce((a, h) => a + h.actual, 0);
+  const goalN = nm(INTENTS[st.goal]); const eqN = st.equip.includes('roller') ? nm(EQ.roller) : st.equip.includes('mat') ? nm(EQ.mat) : nm(EQ.none);
+  const date = new Date().toLocaleDateString(st.lang === 'pl' ? 'pl-PL' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  const paused = st.paused && SESSIONS.concat(st.routines.map(routineAsSession)).find(x => x.id === st.paused.sid);
+  return `${header(`<button class="ib" data-a="tab" data-id="more" aria-label="${tr('settings')}">${ico('settings')}</button>`)}
+  <h1>${tr('today')}</h1><p class="sub">${esc(date)}</p>
+  ${paused ? `<div class="card fade-in" style="background:var(--smith-accent-soft)"><div class="cap">${tr('continue')}</div><div class="t" style="font:700 17px var(--smith-font-display)">${esc(nm(paused.n))}</div><p class="cap" style="margin:4px 0 12px">${tr('stepN', { i: st.paused.pi + 1, n: phases(paused.steps).length })}</p><button class="btn pri" data-a="resume">${tr('resume')}</button></div><div style="height:12px"></div>` : ''}
+  <div class="card fade-in">
+    ${s ? `<div class="row"><div class="grow"><div class="cap">${esc(nm(INTENTS[st.goal]))}</div><div style="font:800 24px/1.2 var(--smith-font-display);margin-top:2px">${esc(nm(s.n))}</div></div><div style="text-align:right"><div class="met">${mins(dur(s))}</div><div class="cap">${tr('min')}</div></div></div>
+    <p class="cap" style="margin:10px 0 14px;font-size:14px;line-height:20px">${esc(rec.fb ? tr('whyFallback', { g: goalN, m: st.time }) : tr('why', { g: goalN, m: st.time, e: eqN.toLowerCase() }))}</p>
+    <button class="btn pri" data-a="startRec" data-id="${s.id}">${ico('play')}${tr('start')}</button>` : `<div class="empty">${tr('empty')}</div>`}
+    <div style="text-align:center;margin-top:6px"><button class="btn ghost" data-a="adjust">${tr('adjust')}: ${esc(goalN)} · ${st.time} ${tr('min')}</button></div>
+  </div>
+  <h2>${tr('quick')}</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${['prep', 'wind', 'mob'].map(k => `<button class="li" style="margin:0;flex-direction:column;align-items:flex-start;gap:4px" data-a="quick" data-id="${k}"><span class="t">${esc(nm(INTENTS[k]))}</span><span class="m">${esc(nm(TYPES[k === 'wind' ? 'stat' : k].d))}</span></button>`).join('')}<button class="li" style="margin:0;flex-direction:column;align-items:flex-start;gap:4px" data-a="tab" data-id="sessions"><span class="t">${tr('explore')}</span><span class="m">${SESSIONS.length} ${tr('sessions').toLowerCase()}</span></button></div>
+  <h2>${tr('week')}</h2>
+  <div class="card row"><div class="grow"><div class="met">${wk.length}</div><div class="cap">${wk.length ? tr('weekN', { n: wk.length, m: Math.round(wm / 60) }) : tr('weekNone')}</div></div></div>
+  ${st.hist.length ? `<h2>${tr('recent')}</h2>${st.hist.slice(0, 3).map(histRow).join('')}` : ''}`;
+}
+function histRow(h) { const d = new Date(h.at).toLocaleDateString(st.lang === 'pl' ? 'pl-PL' : 'en-GB', { day: 'numeric', month: 'short' });
+  return `<div class="li" style="cursor:default"><div class="grow"><div class="t">${esc(h.name)}</div><div class="m">${d} · ${tr('actual')} ${fmt(h.actual)} / ${tr('planned')} ${fmt(h.planned)}${h.note ? ' · ' + esc(h.note) : ''}</div></div><span class="tag"><i style="--c:${h.done ? 'var(--smith-positive)' : 'var(--smith-warning)'}"></i>${h.done ? tr('complete') : tr('partial')}</span></div>`; }
+function viewSessions() {
+  const f = ui.filt; const q = f.q.trim().toLowerCase();
+  const list = SESSIONS.filter(s => (f.intent === 'all' || s.intent === f.intent) && (!q || nm(s.n).toLowerCase().includes(q)));
+  return `${header()}<h1>${tr('sessions')}</h1><p class="sub"></p>
+  <div class="search"><span class="ico-w">${ico('search')}</span><input class="field" id="sq" type="search" placeholder="${tr('search')}" value="${esc(f.q)}" aria-label="${tr('search')}"></div>
+  <div class="chips" role="group" aria-label="filters" style="margin-top:10px">${['all', 'prep', 'wind', 'mob', 'roll'].map(k => `<button class="chip" aria-pressed="${f.intent === k}" data-a="fint" data-id="${k}">${k === 'all' ? tr('all') : esc(nm(INTENTS[k]))}</button>`).join('')}</div>
+  <div id="slist">${list.map(sessCard).join('') || `<div class="empty">${tr('empty')}</div>`}</div>`;
+}
+function viewMine() {
+  return `${header(`<button class="ib" data-a="newR" aria-label="${tr('newS')}">${ico('plus')}</button>`)}<h1>${tr('mine')}</h1><p class="sub"></p>
+  ${st.routines.length ? st.routines.map(r => { const e = estimate(r.steps); return `<button class="li" data-a="editR" data-id="${r.id}"><div class="grow"><div class="t">${esc(r.n)}</div><div class="m">${fmt(e.total)} · ${tr('exN', { n: r.steps.length })}</div></div>${ico('chev')}</button>`; }).join('') : `<div class="empty">${tr('mineEmpty')}</div>`}
+  <button class="btn pri" data-a="newR" style="margin-top:8px">${ico('plus')}${tr('newS')}</button>`;
+}
+function viewLib() {
+  const f = ui.lib; const q = f.q.trim().toLowerCase();
+  const list = EX.filter(e => (f.type === 'all' || e.t === f.type) && (!f.fav || st.favs.includes(e.id)) && (!q || nm(e.n).toLowerCase().includes(q) || nm(AREAS[e.a]).toLowerCase().includes(q)));
+  return `${header()}<h1>${tr('lib')}</h1><p class="sub"></p>
+  <div class="search"><span>${ico('search')}</span><input class="field" id="lq" type="search" placeholder="${tr('search')}" value="${esc(f.q)}" aria-label="${tr('search')}"></div>
+  <div class="chips" style="margin-top:10px">${['all', 'prep', 'mob', 'stat', 'roll'].map(k => `<button class="chip" aria-pressed="${f.type === k}" data-a="ftype" data-id="${k}">${k === 'all' ? tr('all') : esc(nm(TYPES[k].n))}</button>`).join('')}<button class="chip" aria-pressed="${f.fav}" data-a="ffav">${tr('favs')}</button></div>
+  <div id="llist">${libList(list)}</div>`;
+}
+const libList = list => list.map(e => `<button class="li" data-a="ex" data-id="${e.id}"><div class="grow"><div class="t">${esc(nm(e.n))}</div><div class="m">${esc(nm(AREAS[e.a]))} · ${esc(metaOf(e))} · ${esc(nm(EQ[e.eq]))}</div><div style="margin-top:6px">${tag(e.t)}</div></div>${st.favs.includes(e.id) ? `<span style="color:var(--smith-accent)">${ico('heart').replace('class="ico"', 'class="ico" style="fill:currentColor"')}</span>` : ''}${ico('chev')}</button>`).join('') || `<div class="empty">${tr('empty')}</div>`;
+function viewMore() {
+  const seg = (key, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button class="chip" aria-pressed="${st[key] === v}" data-a="set" data-k="${key}" data-v="${v}">${l}</button>`).join('')}</div>`;
+  const tog = (key, l) => `<div class="row" style="min-height:52px"><div class="grow">${l}</div><button class="chip" role="switch" aria-checked="${st[key]}" aria-pressed="${st[key]}" data-a="tog" data-k="${key}">${st[key] ? 'ON' : 'OFF'}</button></div>`;
+  return `${header()}<h1>${tr('more')}</h1><p class="sub">${tr('onlyLocal')}</p>
+  <div class="card"><b>${tr('theme')}</b>${seg('theme', [['system', tr('sys')], ['light', tr('light')], ['dark', tr('dark')]])}<b>${tr('lang')}</b>${seg('lang', [['pl', 'Polski'], ['en', 'English']])}<b>${tr('motion')}</b>${seg('motion', [['system', tr('motionSys')], ['off', tr('motionOff')]])}${tog('sound', tr('sound'))}${tog('haptic', tr('haptic'))}</div>
+  <button class="li" style="margin-top:12px" data-a="hist"><span class="grow t">${tr('history')}</span>${ico('chev')}</button>
+  <div class="card" style="margin-top:2px"><b>${tr('backup')}</b><p class="cap" style="margin:4px 0 10px">JSON, schema v1</p><button class="btn sec" data-a="export">${tr('export')}</button></div>
+  <button class="li" style="margin-top:12px" data-a="replay"><span class="grow t">${tr('replay')}</span>${ico('chev')}</button>
+  <div class="notice" style="margin-top:12px">${ico('info')}<div><b>${tr('about')}</b><br>${tr('disclaimer')}</div></div>`;
+}
+const NAV = [['today', 'nav_today'], ['sessions', 'nav_sessions'], ['mine', 'nav_mine'], ['lib', 'nav_lib'], ['more', 'nav_more']];
+const VIEWS = { today: viewToday, sessions: viewSessions, mine: viewMine, lib: viewLib, more: viewMore };
+function render(keepScroll = true) {
+  applyTheme();
+  const sc = $('#main'); const y = keepScroll && sc ? sc.scrollTop : 0;
+  const idx = NAV.findIndex(n => n[0] === ui.tab);
+  phone.querySelector('#app')?.remove();
+  const el = document.createElement('div'); el.id = 'app';
+  el.innerHTML = `<div class="scroll" id="main">${VIEWS[ui.tab]()}</div>
+  <nav class="nav" aria-label="Flexsmith"><span class="pill" id="pill"></span>${NAV.map(([k, l]) => `<button data-a="tab" data-id="${k}" ${k === ui.tab ? 'aria-current="page"' : ''}>${ico(k)}<span>${tr(l)}</span></button>`).join('')}</nav>`;
+  phone.insertBefore(el, phone.firstChild);
+  const m = el.querySelector('#main'); m.scrollTop = y;
+  const pill = $('#pill'); const prev = render.prev; render.prev = idx;
+  if (prev !== undefined && prev !== idx) { placePill(prev, false); void pill.offsetWidth; placePill(idx, true); } else placePill(idx, false);
+  renderOverlays();
+}
+function placePill(idx, animate) {
+  const nav = phone.querySelector('.nav'); const pill = $('#pill'); if (!nav || !pill) return;
+  const b = nav.querySelectorAll('button')[idx]; if (!b) return;
+  pill.style.transition = animate ? '' : 'none';
+  pill.style.width = b.offsetWidth + 'px'; pill.style.transform = `translateX(${b.offsetLeft}px)`;
+}
+function renderOverlays() {
+  phone.querySelectorAll('.page,.sheet,.scrim,.toast').forEach(n => n.remove());
+  if (ui.page) phone.append(pageEl());
+  if (ui.sheet) { const sc = document.createElement('div'); sc.className = 'scrim'; sc.dataset.a = 'closeSheet'; phone.append(sc); phone.append(sheetEl()); const f = phone.querySelector('.sheet [autofocus],.sheet button'); }
+  if (ui.toast) { const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.innerHTML = `<span class="grow">${esc(ui.toast.msg)}</span>${ui.toast.undo ? `<button data-a="undo">${tr('undo')}</button>` : ''}`; phone.append(t); }
+}
+function toast(msg, undo) { ui.toast = { msg, undo }; renderOverlays(); clearTimeout(toast.t); toast.t = setTimeout(() => { ui.toast = null; phone.querySelector('.toast')?.remove(); }, 5000); }
+/* ---- pages ---- */
+const topbar = (title, right = '') => `<div class="hdr" style="padding:max(8px,env(safe-area-inset-top)) 16px 0"><button class="ib" data-a="back" aria-label="${tr('backLbl')}">${ico('back')}</button><b style="font:700 17px var(--smith-font-display)" class="grow" >${esc(title)}</b><div style="display:flex">${right}</div></div>`;
+function pageEl() {
+  const p = ui.page; const el = document.createElement('div'); el.className = 'page'; el.setAttribute('role', 'region');
+  if (p.t === 'ex') { const e = exById(p.id); el.setAttribute('aria-label', nm(e.n));
+    const fav = st.favs.includes(e.id);
+    el.innerHTML = `${topbar(nm(TYPES[e.t].n), `<button class="fav" data-a="fav" data-id="${e.id}" aria-pressed="${fav}" aria-label="${tr('fav')}">${ico('heart', '')}</button>`)}<div class="scroll">
+    <h1 style="font-size:28px">${esc(nm(e.n))}</h1><div class="row" style="flex-wrap:wrap;margin:6px 0 14px">${tag(e.t)}<span class="cap">${esc(nm(AREAS[e.a]))} · ${esc(metaOf(e))} · ${esc(nm(EQ[e.eq]))}</span></div>
+    <div class="media"><svg viewBox="0 0 108 108" fill="none" stroke="var(--smith-accent)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">${MARK}<circle cx="54" cy="24" r="7.5" fill="var(--smith-accent)" stroke="none"/></svg><span class="lab">${tr('mediaNote')}</span></div>
+    <p style="margin:14px 0 0">${esc(nm(e.how))}</p>
+    ${acc('instr', tr('instr'), `<ol class="steps">${e.steps[st.lang].map(x => `<li>${esc(x)}</li>`).join('')}</ol>`, true)}
+    ${acc('err', tr('mistakes'), `<ul class="steps">${e.err[st.lang].map(x => `<li>${esc(x)}</li>`).join('')}</ul>`)}
+    ${acc('var', tr('easier') + ' / ' + tr('harder'), `<p style="margin:0"><b>${tr('easier')}:</b> ${esc(nm(e.easy))}</p><p style="margin:6px 0 0"><b>${tr('harder')}:</b> ${esc(nm(e.hard))}</p>`)}
+    <div class="notice" style="margin-top:14px">${ico('warn')}<div><b>${tr('caution')}.</b> ${esc(nm(e.caut))} ${tr('stopPain')}</div></div>
+    <button class="btn sec" style="width:100%;margin-top:14px" data-a="addTo" data-id="${e.id}">${ico('plus')}${tr('addTo')}</button></div>`; }
+  if (p.t === 'session') { const s = p.mine ? routineAsSession(st.routines.find(r => r.id === p.id)) : SESSIONS.find(x => x.id === p.id); el.setAttribute('aria-label', nm(s.n));
+    const e = estimate(s.steps);
+    el.innerHTML = `${topbar(nm(s.n))}<div class="scroll"><h1 style="font-size:28px">${esc(nm(s.n))}</h1><p class="sub">${esc(nm(s.d))}</p>
+    <div class="card row" style="gap:20px"><div><div class="met">${mins(e.total)}</div><div class="cap">${tr('min')}</div></div><div><div class="met">${s.steps.length}</div><div class="cap">${tr('sessionSteps').toLowerCase()}</div></div><div class="grow cap">${esc(sessEq(s).length ? sessEq(s).map(q => nm(EQ[q])).join(', ') : nm(EQ.none))}</div></div>
+    <h2>${tr('sessionSteps')}</h2>${s.steps.map((x, i) => { const ex = exById(x.ex); const v = x.dur ?? ex.dur; return `<button class="li" data-a="ex" data-id="${ex.id}" style="min-height:60px"><span class="step n" style="box-shadow:none;margin:0;padding:0;background:var(--smith-surface-muted);width:28px;height:28px">${i + 1}</span><div class="grow"><div class="t" style="font-size:15px">${esc(nm(ex.n))}</div><div class="m">${v} ${ex.mode === 'time' ? tr('sec') : tr('reps')}${ex.sides ? ' · ' + tr('perSide') : ''}</div></div>${tag(ex.t)}</button>`; }).join('')}
+    <div class="notice info" style="margin:6px 0 14px">${ico('info')}<div>${tr('calc', { w: e.ph, work: fmt(e.work), n: Math.max(0, e.ph - 1), t: TRANS })} = <b>${fmt(e.total)}</b>. ${tr('counts', { s: 4 })}</div></div>
+    <button class="btn pri" data-a="startSess" data-id="${s.id}" data-mine="${p.mine ? 1 : 0}">${ico('play')}${tr('startS')}</button>
+    <button class="btn sec" style="width:100%;margin-top:10px" data-a="${p.mine ? 'editR' : 'copyS'}" data-id="${s.id}">${p.mine ? tr('mine') : tr('makeCopy')}</button></div>`; }
+  if (p.t === 'edit') { const r = st.routines.find(x => x.id === p.id); const e = estimate(r.steps);
+    el.setAttribute('aria-label', r.n);
+    el.innerHTML = `${topbar(tr('mine'), `<button class="ib" data-a="dupR" aria-label="${tr('duplicate')}">${ico('copy')}</button><button class="ib" data-a="delR" aria-label="${tr('del')}" style="color:var(--smith-danger)">${ico('trash')}</button>`)}<div class="scroll">
+    <label class="cap" for="rn">${tr('name')}</label><input class="field" id="rn" value="${esc(r.n)}" maxlength="60" style="margin-bottom:14px">
+    <div class="card row" style="gap:16px;margin-bottom:12px"><div><div class="met" id="tot">${fmt(e.total)}</div><div class="cap">${tr('total')}</div></div><div class="grow cap" id="calc">${tr('calc', { w: e.ph, work: fmt(e.work), n: Math.max(0, e.ph - 1), t: TRANS })}</div></div>
+    <div id="steps">${r.steps.map((x, i) => stepRow(x, i, r.steps.length)).join('') || `<div class="empty">${tr('empty')}</div>`}</div>
+    <button class="btn sec" style="width:100%;margin-top:6px" data-a="addEx">${ico('plus')}${tr('add')}</button>
+    <button class="btn pri" style="margin-top:14px" data-a="saveR">${tr('save')}</button>
+    <button class="btn sec" style="width:100%;margin-top:10px" data-a="startSess" data-id="${r.id}" data-mine="1" ${r.steps.length ? '' : 'disabled'}>${ico('play')}${tr('startS')}</button></div>`; }
+  if (p.t === 'hist') { el.setAttribute('aria-label', tr('history'));
+    el.innerHTML = `${topbar(tr('history'))}<div class="scroll">${st.hist.length ? st.hist.map(histRow).join('') : `<div class="empty">${tr('noHist')}</div>`}</div>`; }
+  return el;
+}
+const acc = (id, title, body, open = false) => `<div class="acc" data-open="${open}" id="acc-${id}"><button data-a="acc" data-id="${id}" aria-expanded="${open}">${title}${ico('chev', 'ico chev')}</button><div class="body"><div><div class="inner">${body}</div></div></div></div>`;
+function stepRow(x, i, n) { const e = exById(x.ex); const v = x.dur ?? e.dur; const unit = e.mode === 'time' ? tr('sec') : tr('reps'); const stepv = e.mode === 'time' ? 5 : 1;
+  return `<div class="step" data-i="${i}" style="flex-wrap:wrap"><span class="n">${i + 1}</span><div class="grow"><div style="font:700 15px var(--smith-font-display)">${esc(nm(e.n))}</div></div>
+  <button class="mini" data-a="mv" data-i="${i}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="up">${ico('up')}</button><button class="mini" data-a="mv" data-i="${i}" data-d="1" ${i === n - 1 ? 'disabled' : ''} aria-label="down">${ico('down')}</button><button class="mini" data-a="rmStep" data-i="${i}" aria-label="${tr('del')}">${ico('trash')}</button>
+  <div class="row" style="width:100%;padding-left:36px;justify-content:space-between"><span class="cap">${e.sides ? tr('perSide') : '&nbsp;'}</span><div class="stepper" role="group" aria-label="${tr('duration')}"><button data-a="stepdur" data-i="${i}" data-d="-${stepv}" aria-label="-">−</button><span>${v} ${unit}</span><button data-a="stepdur" data-i="${i}" data-d="${stepv}" aria-label="+">+</button></div></div></div>`; }
+/* ---- sheets ---- */
+function sheetEl() {
+  const s = ui.sheet; const el = document.createElement('div'); el.className = 'sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+  if (s.t === 'adjust') el.innerHTML = `<h3>${tr('adjust')}</h3><p class="cap" style="margin:0 0 10px">${tr('skipNow')}</p><b>${tr('goal')}</b><div class="seg">${['prep', 'wind', 'mob', 'roll'].map(k => `<button class="chip" aria-pressed="${st.goal === k}" data-a="setGoal" data-id="${k}">${esc(nm(INTENTS[k]))}</button>`).join('')}</div>
+    <b>${tr('time')}</b><div class="seg">${[5, 10, 15, 20, 30].map(m => `<button class="chip" aria-pressed="${st.time === m}" data-a="setTime" data-id="${m}">${m} ${tr('min')}</button>`).join('')}</div>
+    <b>${tr('equip')}</b><div class="seg">${['mat', 'roller'].map(k => `<button class="chip" aria-pressed="${st.equip.includes(k)}" data-a="setEq" data-id="${k}">${esc(nm(EQ[k]))}</button>`).join('')}</div>
+    <button class="btn pri" data-a="closeSheet">${tr('done')}</button>`;
+  if (s.t === 'confirm') el.innerHTML = `<h3>${tr('del')}</h3><p>${esc(s.msg)}</p><button class="btn danger" style="width:100%" data-a="confirmDel">${tr('del')}</button><button class="btn sec" style="width:100%;margin-top:10px" data-a="closeSheet">${tr('cancel')}</button>`;
+  if (s.t === 'pick') { const q = (s.q || '').toLowerCase(); const list = EX.filter(e => !q || nm(e.n).toLowerCase().includes(q));
+    el.innerHTML = `<h3>${tr('add')}</h3><input class="field" id="pq" type="search" placeholder="${tr('search')}" value="${esc(s.q || '')}" aria-label="${tr('search')}" style="margin:8px 0">${`<div id="plist">${pickList(list)}</div>`}`; }
+  if (s.t === 'pickRoutine') el.innerHTML = `<h3>${tr('pick')}</h3>${st.routines.map(r => `<button class="li" data-a="addToR" data-id="${r.id}">${esc(r.n)}</button>`).join('')}<button class="btn sec" style="width:100%" data-a="addToNew">${tr('newS')}</button>`;
+  return el;
+}
+const pickList = list => list.map(e => `<button class="li" data-a="pickEx" data-id="${e.id}" style="min-height:56px"><div class="grow"><div class="t" style="font-size:15px">${esc(nm(e.n))}</div><div class="m">${esc(nm(AREAS[e.a]))} · ${esc(metaOf(e))}</div></div>${tag(e.t)}</button>`).join('');
+/* ================= player (timestamp-based, not a chain of setInterval ticks) ================= */
+let P = null;
+function startPlayer(sess, resumeState) {
+  const ph = phases(sess.steps); if (!ph.length) return;
+  P = { sid: sess.id, name: nm(sess.n), steps: sess.steps, ph, i: resumeState?.pi ?? 0, running: true, endAt: 0, remain: 0, doneActive: resumeState?.active ?? 0, tmarks: performance.now(), plannedSec: estimate(sess.steps).total, mod: false, swaps: 0, raf: 0, anim: true };
+  beginPhase(); mountPlayer();
+}
+const cur = () => P.ph[P.i];
+function beginPhase() { const p = cur(); P.remain = p.mode === 'time' ? p.val : 0; P.endAt = performance.now() + P.remain * 1000; P.tmarks = performance.now(); P.running = true; P.repsDone = false; }
+function acct() { if (P.running) { P.doneActive += (performance.now() - P.tmarks) / 1000; } P.tmarks = performance.now(); }
+function left() { return Math.max(0, P.running ? (P.endAt - performance.now()) / 1000 : P.remain); }
+function mountPlayer() {
+  phone.querySelector('#player')?.remove(); const el = document.createElement('div'); el.id = 'player'; el.setAttribute('role', 'region'); el.setAttribute('aria-label', P.name);
+  phone.append(el); drawPlayer(); loop();
+}
+function drawPlayer() {
+  const el = $('#player'); if (!el) return; const p = cur(); const e = exById(p.ex); const n = P.ph.length;
+  const next = P.ph[P.i + 1]; const nx = next && exById(next.ex);
+  const sideTxt = p.side ? (p.side === 'L' ? tr('left') : tr('right')) : '';
+  el.innerHTML = `<div class="pl-top"><button class="ib" data-a="plClose" aria-label="${tr('closeLbl')}">${ico('close')}</button><div style="text-align:center"><div class="cap">${esc(P.name)}</div><div style="font:700 14px var(--smith-font-display)">${tr('stepN', { i: P.i + 1, n })}</div></div><div style="width:44px"></div></div>
+  <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${P.i}"><i style="width:${(P.i / n) * 100}%"></i></div>
+  <div class="pl-body"><div class="${P.anim ? 'pl-step' : ''}" id="plstep" style="display:flex;flex-direction:column;gap:12px">
+    <div style="text-align:center;margin-top:10px">${tag(e.t)}<h1 style="font-size:26px;margin:8px 0 0">${esc(nm(e.n))}</h1></div>
+    ${sideTxt ? `<span class="side" aria-live="polite">${tr('side')}: ${sideTxt}</span>` : ''}
+    ${p.mode === 'time' ? `<div class="ring" role="timer" aria-label="${tr('secLeft')}"><svg viewBox="0 0 176 176"><circle class="bg" cx="88" cy="88" r="78"/><circle class="fg" id="rfg" cx="88" cy="88" r="78" stroke-dasharray="490.1" stroke-dashoffset="0"/></svg><div class="val"><b id="tl">${Math.ceil(left())}</b><span>${tr('secLeft')}</span></div></div>`
+      : `<div class="ring"><svg viewBox="0 0 176 176"><circle class="bg" cx="88" cy="88" r="78"/></svg><div class="val"><b>${p.val}</b><span>${tr('repsLeft')}</span></div></div>`}
+    <div class="card" style="padding:12px 14px"><div style="font-size:15px">${esc(nm(e.how))}</div><ol class="steps" style="margin-top:8px;font-size:14px;color:var(--smith-text-secondary)">${e.steps[st.lang].map(x => `<li>${esc(x)}</li>`).join('')}</ol></div>
+    ${nx ? `<div class="cap" style="text-align:center">${tr('nextUp')}: <b>${esc(nm(nx.n))}${next.side ? ' · ' + (next.side === 'L' ? tr('left') : tr('right')) : ''}</b></div>` : ''}
+  </div></div>
+  <div class="ctl"><button class="sidebtn" data-a="plPrev" aria-label="${tr('prev')}">${ico('skipb')}${tr('prev')}</button>
+    ${p.mode === 'time' ? `<button class="big" id="pp" data-a="plPause" aria-label="${P.running ? tr('pause') : tr('resumeB')}">${P.running ? '<svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg>'}</button>` : `<button class="big" data-a="plDone" aria-label="${tr('tapDone')}"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}
+    <button class="sidebtn" data-a="plNext" aria-label="${tr('next')}">${tr('next')}${ico('skip')}</button></div>
+  <div class="ctl2">${p.mode === 'time' ? `<button class="btn sec" data-a="plAdj" data-d="-10">−10 ${tr('sec')}</button><button class="btn sec" data-a="plAdj" data-d="10">+10 ${tr('sec')}</button>` : ''}<button class="btn sec" data-a="plSwap">${ico('swap')}${tr('swap')}</button><button class="btn ghost" data-a="plFinish">${tr('finishEarly')}</button></div>
+  <div class="sr" aria-live="polite" id="plLive">${esc(nm(e.n))} ${sideTxt}</div>`;
+  P.anim = false; tickPlayer();
+}
+function tickPlayer() { if (!P || P.over) return; const p = cur(); if (p.mode !== 'time') return; const l = left(); const tl = $('#tl'); if (tl) tl.textContent = Math.ceil(l); const fg = $('#rfg'); if (fg) fg.setAttribute('stroke-dashoffset', String(490.1 * (1 - l / Math.max(1, p.val))).slice(0, 8));
+  if (P.running && l <= 0) advance(1, true); }
+function loop() { cancelAnimationFrame(P?.raf); if (!P || P.over) return; P.raf = requestAnimationFrame(() => { tickPlayer(); loop(); }); }
+document.addEventListener('visibilitychange', () => { if (P && !document.hidden) tickPlayer(); });  // timestamps, so a background gap is accounted for on return
+function cue() { if (st.haptic && navigator.vibrate) navigator.vibrate(60); if (st.sound) { try { const a = new (window.AudioContext || window.webkitAudioContext)(); const o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); g.gain.value = .04; o.frequency.value = 660; o.start(); o.stop(a.currentTime + .12); } catch {} } }
+function advance(d, auto) {
+  acct(); const was = P.i; const ni = P.i + d;
+  if (ni >= P.ph.length) { finishPlayer(true); return; }
+  if (ni < 0) { P.anim = true; beginPhase(); drawPlayer(); return; }
+  P.i = ni; P.anim = true; if (auto) cue(); beginPhase(); drawPlayer();
+}
+function pausePlayer() { acct(); if (P.running) { P.remain = left(); P.running = false; } else { P.endAt = performance.now() + P.remain * 1000; P.tmarks = performance.now(); P.running = true; } drawPlayer(); st.paused = { sid: P.sid, pi: P.i, active: P.doneActive }; save(); }
+function finishPlayer(complete) {
+  ui.toast = null; phone.querySelector('.toast')?.remove();
+  acct(); P.over = true; cancelAnimationFrame(P.raf); const el = $('#player'); const act = Math.round(P.doneActive);
+  const planned = Math.round(P.plannedSec);
+  el.innerHTML = `<div class="pl-top"><div style="width:44px"></div><b style="font:700 17px var(--smith-font-display)">${complete ? tr('complete') : tr('partial')}</b><div style="width:44px"></div></div><div class="pl-body" style="text-align:center">
+    ${complete ? `<svg class="check" viewBox="0 0 84 84"><circle cx="42" cy="42" r="36" pathLength="1"/><path d="M26 43l11 11 21-24" pathLength="1"/></svg>` : ''}
+    <div class="card row" style="justify-content:center;gap:28px"><div><div class="met">${fmt(act)}</div><div class="cap">${tr('actual')}</div></div><div><div class="met" style="color:var(--smith-text-secondary)">${fmt(planned)}</div><div class="cap">${tr('planned')}</div></div></div>
+    <div style="text-align:left"><b>${tr('comfort')}</b><div class="seg" id="cm">${[['ok', 'cOk'], ['mid', 'cMid'], ['bad', 'cBad']].map(([k, l]) => `<button class="chip" aria-pressed="false" data-a="cmf" data-id="${k}">${tr(l)}</button>`).join('')}</div>
+    <label class="cap" for="nt">${tr('note')}</label><input class="field" id="nt" maxlength="120"></div></div>
+    <button class="btn pri" data-a="plSave" data-c="${complete ? 1 : 0}" data-act="${act}">${tr('save')}</button>`;
+}
+function closePlayer() { cancelAnimationFrame(P?.raf); $('#player')?.remove(); P = null; }
+function swapEx() { const p = cur(); const e = exById(p.ex);
+  const alt = EX.filter(x => x.id !== e.id && x.t === e.t && x.a === e.a && eqOk(x)); const alt2 = alt.length ? alt : EX.filter(x => x.id !== e.id && x.t === e.t && eqOk(x));
+  if (!alt2.length) { toast(tr('noAlt')); return; }
+  const pick = alt2[(P.swaps++) % alt2.length]; const n = P.ph[P.i];
+  // replace this step on both sides with the alternative (same intent)
+  P.ph = P.ph.map(q => q.i === n.i ? { ...q, ex: pick.id, mode: pick.mode, val: pick.dur, spr: pick.spr || 4 } : q); P.mod = true; beginPhase(); drawPlayer(); toast(tr('replaceIf') + ': ' + nm(pick.n)); }
+/* ================= splash: animation done AND app ready (never a single timeout) ================= */
+const SPL_MS = 1600;
+function splashHTML() { const parts = [['M26 48 C43 41 63 42 82 36', 9.5, 300, 330], ['M54 52 C50 60 44 68 33 84', 10, 520, 260], ['M54 52 C63 62 71 72 77 84', 10, 640, 260]];
+  return `<div id="splash" role="status" aria-label="Flexsmith"><svg class="sp-tile" viewBox="0 0 108 108" aria-hidden="true"><defs>${parts.map((p, i) => `<mask id="spm${i}" maskUnits="userSpaceOnUse" x="0" y="0" width="108" height="108"><path class="sp-rv" pathLength="1" fill="none" stroke="#fff" stroke-width="${p[1] + 10}" stroke-linecap="butt" style="--d:${p[2]}ms;--t:${p[3]}ms" d="${p[0]}"/></mask>`).join('')}</defs><rect width="108" height="108" rx="26" fill="var(--tile)"/><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">${parts.map((p, i) => `<g mask="url(#spm${i})"><path d="${p[0]}" stroke-width="${p[1]}"/></g>`).join('')}</g><circle class="sp-head" cx="54" cy="24" r="7.5" fill="#fff"/></svg><p class="sp-name">Flexsmith</p><i class="sp-end" aria-hidden="true"></i></div>`; }
+function playSplash(readyDelay = 0) {
+  phone.querySelector('#splash')?.remove(); phone.insertAdjacentHTML('beforeend', splashHTML()); const el = $('#splash');
+  const reduced = document.documentElement.dataset.motion === 'reduce' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const anim = new Promise(res => { if (reduced) setTimeout(res, 600); else el.querySelector('.sp-end').addEventListener('animationend', res, { once: true }); setTimeout(res, SPL_MS + 2500); });
+  const ready = new Promise(res => setTimeout(res, readyDelay));
+  Promise.all([anim, ready]).then(() => { el.classList.add('out'); setTimeout(() => el.remove(), reduced ? 160 : 300); window.__splashDone = true; });
+}
+/* ================= events ================= */
+const act = {
+  tab: id => { ui.tab = id; ui.page = null; render(false); },
+  back: () => { ui.page = ui.page.from || null; render(); },
+  session: (id, el) => { ui.page = { t: 'session', id, from: null }; renderOverlays(); },
+  ex: id => { ui.page = { t: 'ex', id, from: ui.page && ui.page.t !== 'ex' ? ui.page : null }; renderOverlays(); },
+  fav: id => { st.favs = st.favs.includes(id) ? st.favs.filter(x => x !== id) : [...st.favs, id]; save(); const b = phone.querySelector('.fav'); b.setAttribute('aria-pressed', st.favs.includes(id)); },
+  acc: id => { const a = $('#acc-' + id); const o = a.dataset.open !== 'true'; a.dataset.open = o; a.querySelector('button').setAttribute('aria-expanded', o); },
+  adjust: () => { ui.sheet = { t: 'adjust' }; renderOverlays(); }, closeSheet: () => { ui.sheet = null; render(); },
+  setGoal: id => { st.goal = id; save(); ui.sheet = { t: 'adjust' }; render(); }, setTime: id => { st.time = +id; save(); ui.sheet = { t: 'adjust' }; render(); },
+  setEq: id => { st.equip = st.equip.includes(id) ? st.equip.filter(x => x !== id) : [...st.equip, id]; save(); ui.sheet = { t: 'adjust' }; render(); },
+  quick: id => { st.goal = id; save(); const r = recommend(); if (r.s) { ui.page = { t: 'session', id: r.s.id }; renderOverlays(); } else toast(tr('empty')); },
+  startRec: id => startPlayer(SESSIONS.find(s => s.id === id)),
+  startSess: (id, el) => { const mine = el.dataset.mine === '1'; const s = mine ? routineAsSession(st.routines.find(r => r.id === id)) : SESSIONS.find(x => x.id === id); startPlayer(s); },
+  resume: () => { const s = SESSIONS.concat(st.routines.map(routineAsSession)).find(x => x.id === st.paused.sid); const ps = st.paused; startPlayer(s, { pi: ps.pi, active: ps.active }); },
+  fint: id => { ui.filt.intent = id; render(); }, ftype: id => { ui.lib.type = id; render(); }, ffav: () => { ui.lib.fav = !ui.lib.fav; render(); },
+  set: (_, el) => { st[el.dataset.k] = el.dataset.v; save(); render(); }, tog: (_, el) => { st[el.dataset.k] = !st[el.dataset.k]; save(); render(); },
+  hist: () => { ui.page = { t: 'hist' }; renderOverlays(); },
+  export: () => { try { const blob = new Blob([JSON.stringify({ app: 'flexsmith', schema: 1, exportedAt: new Date().toISOString(), data: st }, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'flexsmith-backup.json'; a.click(); toast(tr('exportOk')); } catch { toast('!'); } },
+  replay: () => { playSplash(0); },
+  newR: () => { const r = { id: 'r' + Date.now(), n: tr('newS'), steps: [] }; st.routines.push(r); save(); ui.tab = 'mine'; ui.page = { t: 'edit', id: r.id }; render(); },
+  editR: id => { ui.page = { t: 'edit', id }; renderOverlays(); },
+  copyS: id => { const s = SESSIONS.find(x => x.id === id); const r = { id: 'r' + Date.now(), n: tr('copyOf') + nm(s.n), steps: s.steps.map(x => ({ ...x })) }; st.routines.push(r); save(); ui.page = { t: 'edit', id: r.id }; renderOverlays(); },
+  dupR: () => { const r = st.routines.find(x => x.id === ui.page.id); const c = { id: 'r' + Date.now(), n: r.n + ' (2)', steps: r.steps.map(x => ({ ...x })) }; st.routines.push(c); save(); ui.page = { t: 'edit', id: c.id }; renderOverlays(); toast(tr('routineSaved')); },
+  delR: () => { const r = st.routines.find(x => x.id === ui.page.id); ui.sheet = { t: 'confirm', msg: tr('delQ', { n: r.n }), what: 'routine', id: r.id }; renderOverlays(); },
+  confirmDel: () => { st.routines = st.routines.filter(x => x.id !== ui.sheet.id); save(); ui.sheet = null; ui.page = null; render(); },
+  saveR: () => { const r = st.routines.find(x => x.id === ui.page.id); r.n = $('#rn').value.trim() || r.n; save(); toast(tr('routineSaved')); ui.page = null; render(); },
+  stepdur: (_, el) => { const r = st.routines.find(x => x.id === ui.page.id); const i = +el.dataset.i; const e = exById(r.steps[i].ex); const v = (r.steps[i].dur ?? e.dur) + +el.dataset.d; r.steps[i].dur = Math.max(e.mode === 'time' ? 5 : 1, Math.min(e.mode === 'time' ? 300 : 40, v)); save(); redrawEditor(); },
+  mv: (_, el) => { const r = st.routines.find(x => x.id === ui.page.id); const i = +el.dataset.i, d = +el.dataset.d; const j = i + d; if (j < 0 || j >= r.steps.length) return; [r.steps[i], r.steps[j]] = [r.steps[j], r.steps[i]]; save(); redrawEditor(); },
+  rmStep: (_, el) => { const r = st.routines.find(x => x.id === ui.page.id); const i = +el.dataset.i; const [gone] = r.steps.splice(i, 1); ui.undo = () => { r.steps.splice(i, 0, gone); save(); redrawEditor(); }; save(); redrawEditor(); toast(tr('removed'), true); },
+  undo: () => { ui.undo?.(); ui.undo = null; ui.toast = null; renderOverlays(); },
+  addEx: () => { ui.sheet = { t: 'pick', q: '' }; renderOverlays(); },
+  pickEx: id => { const r = st.routines.find(x => x.id === ui.page.id); r.steps.push({ ex: id }); save(); ui.sheet = null; renderOverlays(); },
+  addTo: id => { ui.sheet = { t: 'pickRoutine', ex: id }; renderOverlays(); },
+  addToR: id => { const r = st.routines.find(x => x.id === id); r.steps.push({ ex: ui.sheet.ex }); save(); ui.sheet = null; renderOverlays(); toast(tr('routineSaved') + ': ' + r.n); },
+  addToNew: () => { const r = { id: 'r' + Date.now(), n: tr('newS'), steps: [{ ex: ui.sheet.ex }] }; st.routines.push(r); save(); ui.sheet = null; ui.tab = 'mine'; ui.page = { t: 'edit', id: r.id }; render(); },
+  plClose: () => { if (P) { acct(); st.paused = { sid: P.sid, pi: P.i, active: P.doneActive }; save(); } closePlayer(); render(); },
+  plPause: () => pausePlayer(), plNext: () => advance(1), plPrev: () => advance(-1), plDone: () => advance(1),
+  plAdj: (_, el) => { const p = cur(); const l = left() + +el.dataset.d; const nv = Math.max(5, Math.round(p.val + +el.dataset.d)); P.ph.forEach(q => { if (q.i === p.i) q.val = nv; }); P.mod = true; if (P.running) P.endAt = performance.now() + Math.max(1, l) * 1000; else P.remain = Math.max(1, l); tickPlayer(); },
+  plSwap: () => swapEx(), plFinish: () => finishPlayer(false),
+  cmf: (_, el) => { phone.querySelectorAll('#cm .chip').forEach(b => b.setAttribute('aria-pressed', b === el ? 'true' : 'false')); },
+  plSave: (_, el) => { const c = phone.querySelector('#cm .chip[aria-pressed="true"]'); st.hist.unshift({ id: 'h' + Date.now(), at: Date.now(), name: P.name, sid: P.sid, done: el.dataset.c === '1', actual: +el.dataset.act, planned: Math.round(P.plannedSec), comfort: c?.dataset.id || null, modified: P.mod, note: $('#nt').value.trim() }); st.paused = null; save(); closePlayer(); ui.tab = 'today'; ui.page = null; render(false); },
+};
+function redrawEditor() { const r = st.routines.find(x => x.id === ui.page.id); const e = estimate(r.steps);
+  $('#steps').innerHTML = r.steps.map((x, i) => stepRow(x, i, r.steps.length)).join('') || `<div class="empty">${tr('empty')}</div>`;
+  $('#tot').textContent = fmt(e.total); $('#calc').textContent = tr('calc', { w: e.ph, work: fmt(e.work), n: Math.max(0, e.ph - 1), t: TRANS }); }
+phone.addEventListener('click', ev => { const t = ev.target.closest('[data-a]'); if (!t) return; const f = act[t.dataset.a]; if (f) { ev.preventDefault(); f(t.dataset.id, t); } });
+phone.addEventListener('input', ev => { const t = ev.target;
+  if (t.id === 'sq') { ui.filt.q = t.value; const q = t.value.trim().toLowerCase(); $('#slist').innerHTML = SESSIONS.filter(s => (ui.filt.intent === 'all' || s.intent === ui.filt.intent) && (!q || nm(s.n).toLowerCase().includes(q))).map(sessCard).join('') || `<div class="empty">${tr('empty')}</div>`; }
+  if (t.id === 'lq') { ui.lib.q = t.value; const q = t.value.trim().toLowerCase(); $('#llist').innerHTML = libList(EX.filter(e => (ui.lib.type === 'all' || e.t === ui.lib.type) && (!ui.lib.fav || st.favs.includes(e.id)) && (!q || nm(e.n).toLowerCase().includes(q) || nm(AREAS[e.a]).toLowerCase().includes(q)))); }
+  if (t.id === 'pq') { ui.sheet.q = t.value; const q = t.value.toLowerCase(); $('#plist').innerHTML = pickList(EX.filter(e => !q || nm(e.n).toLowerCase().includes(q))); } });
+document.addEventListener('keydown', ev => { if (ev.key === 'Escape') { if (ui.sheet) act.closeSheet(); else if (P) {} else if (ui.page) act.back(); } });
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { if (st.theme === 'system') render(); });
+window.addEventListener('resize', () => placePill(NAV.findIndex(n => n[0] === ui.tab), false));
+/* ================= boot ================= */
+render(false);
+const q = new URLSearchParams(location.search);
+if (q.get('nosplash') !== '1') playSplash(120); else window.__splashDone = true;
+window.__flex = { st, get P() { return P; }, act, ui, estimate, SESSIONS, EX, recommend, phases };
+</script>
+</body>
+</html>

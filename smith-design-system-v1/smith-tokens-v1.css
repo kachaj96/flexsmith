@@ -1,0 +1,89 @@
+/* Smith Design System v1 — reference tokens, not a drop-in replacement.
+   Source: Runsmith-proba.html / Repsmith-proba.html, 2026-11-08.
+   Use on a scoped root, map aliases in existing apps, audit CSS precedence. */
+:root,
+[data-smith-theme="light"] {
+  color-scheme: light;
+  --smith-bg: #f4f5f6;
+  --smith-surface: #ffffff;
+  --smith-surface-muted: #eef1f3;
+  --smith-surface-elevated: #e3e7eb;
+  --smith-text: #151a21;
+  --smith-text-secondary: #56606d;
+  --smith-border-subtle: #e4e8ec;
+  --smith-border-strong: #7e8893;
+  --smith-positive: #22663d;
+  --smith-positive-soft: #e2f2e8;
+  --smith-danger: #b8322a;
+  --smith-danger-soft: #fde7e4;
+  --smith-warning: #8f4f00;
+  --smith-warning-soft: #fcefd9;
+  --smith-glass: rgba(248,249,250,.78);
+  --smith-scrim: rgba(18,22,27,.35);
+  --smith-shadow: 0 1px 2px rgba(18,22,27,.04), 0 12px 32px -14px rgba(18,22,27,.16);
+  --smith-font-display: Manrope, Inter, system-ui, sans-serif;
+  --smith-font-body: Inter, system-ui, Roboto, "Segoe UI", sans-serif;
+  --smith-radius-control: 12px;
+  --smith-radius-card: 22px;
+  --smith-radius-modal: 24px;
+  --smith-radius-pill: 999px;
+  --smith-space-1: 4px;
+  --smith-space-2: 8px;
+  --smith-space-3: 12px;
+  --smith-space-4: 16px;
+  --smith-space-5: 20px;
+  --smith-space-6: 24px;
+  --smith-space-8: 32px;
+  --smith-motion-fast: 120ms;
+  --smith-motion-standard: 220ms;
+  --smith-motion-deliberate: 300ms;
+  --smith-spring: cubic-bezier(.2,.9,.25,1.04);
+  --smith-bouncy: cubic-bezier(.3,1.4,.5,1);
+}
+
+[data-smith-theme="dark"] {
+  color-scheme: dark;
+  --smith-bg: #0b0e11;
+  --smith-surface: #161a1f;
+  --smith-surface-muted: #20262d;
+  --smith-surface-elevated: #2a3139;
+  --smith-text: #e9edf1;
+  --smith-text-secondary: #a3adb8;
+  --smith-border-subtle: #2a3139;
+  --smith-border-strong: #6b7580;
+  --smith-positive: #7fd39f;
+  --smith-positive-soft: #16301f;
+  --smith-danger: #ff9a8f;
+  --smith-danger-soft: #43201d;
+  --smith-warning: #f2b866;
+  --smith-warning-soft: #3a2a12;
+  --smith-glass: rgba(20,24,29,.78);
+  --smith-scrim: rgba(0,0,0,.55);
+  --smith-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 32px -14px rgba(0,0,0,.6);
+}
+
+/* Product accent — leave each product recognizable */
+[data-smith-product="runsmith"] {
+  --smith-accent: #1d6b73;
+  --smith-accent-soft: #e0f0f1;
+  --smith-on-accent: #ffffff;
+}
+[data-smith-product="repsmith"] {
+  --smith-accent: #a84b24;
+  --smith-accent-soft: #fbe9e1;
+  --smith-on-accent: #ffffff;
+}
+[data-smith-product="runsmith"][data-smith-theme="dark"] {
+  --smith-accent: #5fb8bf;
+  --smith-accent-soft: #15292c;
+  --smith-on-accent: #071a1c;
+}
+[data-smith-product="repsmith"][data-smith-theme="dark"] {
+  --smith-accent: #ff9f70;
+  --smith-accent-soft: #3a2117;
+  --smith-on-accent: #1a0e08;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --smith-motion-fast: 0ms; --smith-motion-standard: 0ms; --smith-motion-deliberate: 0ms; }
+}

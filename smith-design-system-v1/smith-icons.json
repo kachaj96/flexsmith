@@ -1,0 +1,20 @@
+{
+ "_about": "Smith icon set v1: 24x24 viewBox, stroke 2, round caps and joins, currentColor (the 'more' dots are filled). Both apps draw these names with exactly these paths; each app's test checks it.",
+ "viewBox": "0 0 24 24",
+ "strokeWidth": 2,
+ "icons": {
+  "today": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>",
+  "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"3\"/><path d=\"M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01\"/>",
+  "plan": "<path d=\"M9 6h11M9 12h11M9 18h11\"/><path d=\"M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2\"/>",
+  "progress": "<path d=\"M3 20h18\"/><path d=\"M5 16l4-5 4 3 6-8\"/><path d=\"M15 6h4v4\"/>",
+  "settings": "<path d=\"M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6\"/>",
+  "more": "<circle cx=\"5\" cy=\"12\" r=\"1.8\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"12\" r=\"1.8\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"19\" cy=\"12\" r=\"1.8\" fill=\"currentColor\" stroke=\"none\"/>",
+  "back": "<path d=\"M15 18l-6-6 6-6\"/>",
+  "chevron": "<path d=\"M9 18l6-6-6-6\"/>",
+  "plus": "<path d=\"M12 5v14M5 12h14\"/>",
+  "close": "<path d=\"M18 6L6 18M6 6l12 12\"/>",
+  "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4M12 8h.01\"/>",
+  "history": "<path d=\"M4 12a8 8 0 1 0 2.4-5.7\"/><path d=\"M4 4v4h4\"/><path d=\"M12 8v4l3 2\"/>",
+  "dumbbell": "<path d=\"M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11\"/>"
+ }
+}
