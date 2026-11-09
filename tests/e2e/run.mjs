@@ -37,7 +37,7 @@ async function open(opts = {}, init) {
 }
 async function skipOnboarding(page) { if (await page.locator('[data-a=obSkip]').count()) { await page.click('[data-a=obSkip]'); await page.waitForSelector('[data-testid=nav-today]'); } }
 const iife = (...fns) => fns.map(f => `(${f})();`).join('\n');
-const shot = (page, name) => SHOTS ? page.screenshot({ path: join(SHOTS, `${name}.png`) }) : null;
+const shot = async (page, name) => { if (!SHOTS) return; await page.waitForTimeout(380); await page.screenshot({ path: join(SHOTS, `${name}.png`) }); };
 const hist = page => page.evaluate(() => new Promise(res => { const r = indexedDB.open('flexsmith'); r.onsuccess = () => { const db = r.result; const q = db.transaction('history').objectStore('history').getAll(); q.onsuccess = () => { db.close(); res(q.result); }; }; }));
 const noHScroll = (page, sel = '#main') => page.evaluate(s => { const e = document.querySelector(s); return !e || e.scrollWidth <= e.clientWidth + 1; }, sel);
 const text = page => page.evaluate(() => document.body.innerText);
