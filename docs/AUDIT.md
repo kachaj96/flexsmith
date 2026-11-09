@@ -1,6 +1,6 @@
 # Flexsmith: audyt repozytoriów i notatka architektoniczna (2026-11-09)
 
-Status: **etap 0 (audyt) i checkpoint 1 (prototyp do akceptacji)**. Pełne UI nie jest zaczęte.
+Status: audyt i prototyp zaakceptowane (2026-11-09), logo zmienione na wariant 2, v1.0 zaimplementowane (zobacz `README.md`, `docs/NOT-VERIFIED.md`, `docs/CONTENT-QA.md`).
 
 ## 1. Ustalenia z audytu
 
@@ -35,8 +35,8 @@ Status: **etap 0 (audyt) i checkpoint 1 (prototyp do akceptacji)**. Pełne UI ni
 
 ## 3. Kolor i marka
 
-- Kafel loga: `#8071B4` (oryginalny master z paczki, biały znak ma kontrast 4,25:1, to grafika, wymóg 3:1 spełniony).
-- **Akcent interfejsu musi być ciemniejszy** niż kafel, bo biały tekst na `#8071B4` ma tylko 4,25:1 (wymagane 4,5:1 dla zwykłego tekstu): jasny motyw `#6A5BA0` (5,8:1 na bieli, 5,3:1 na tle), ciemny `#B3A6E6` (7,9:1 na powierzchni), tekst na akcencie `#14102A` (8,4:1). Wartości policzone, test kontrastu wejdzie do CI.
+- Logo: zatwierdzony wariant 2, kafel `#6C5AA2`, biała litera F z dwóch części (liść i korpus). Ten kolor ma 5,8:1 z bielą i 5,3:1 na tle, więc w jasnym motywie kafel i akcent interfejsu to jeden kolor. Ciemny motyw: akcent `#B3A6E6` (7,9:1 na powierzchni), tekst na akcencie `#14102A`. `scripts/validate-contrast.mjs` liczy 41 par z prawdziwych wartości (w `npm test`).
+- Pierwsza ikona (figura z kółkiem, `#8071B4`) została zastąpiona. Mastery zostały w `design/master/` jako historia, nigdzie nie są używane.
 - Typy sesji (dynamiczna, mobilność, statyczna, rolowanie) mają zawsze etykietę tekstową i inny kształt znacznika. Kolor jest tylko dodatkiem.
 - Ikony: masters w `design/master/`. Warstwa adaptacyjna, monochromatyczna i mipmapy powstaną generatorem (jak `scripts/brand.mjs` w Runsmith), po weryfikacji strefy bezpiecznej 66 dp. Master ma okrągłą głowę i trzy kreski: w strefie 66 dp mieści się, ale sprawdzimy to renderem na maskach, nie na słowo.
 

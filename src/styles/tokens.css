@@ -1,0 +1,23 @@
+/* ===== Smith Design System v1 tokens (smith-design-system-v1/smith-tokens-v1.css) + Flexsmith product accent ===== */
+:root,[data-smith-theme="light"]{color-scheme:light;
+  --smith-bg:#f4f5f6;--smith-surface:#fff;--smith-surface-muted:#eef1f3;--smith-surface-elevated:#e3e7eb;--smith-text:#151a21;--smith-text-secondary:#56606d;
+  --smith-border-subtle:#e4e8ec;--smith-border-strong:#7e8893;--smith-positive:#22663d;--smith-positive-soft:#e2f2e8;--smith-danger:#b8322a;--smith-danger-soft:#fde7e4;
+  --smith-warning:#8f4f00;--smith-warning-soft:#fcefd9;--smith-glass:rgba(248,249,250,.78);--smith-scrim:rgba(18,22,27,.35);
+  --smith-shadow:0 1px 2px rgba(18,22,27,.04),0 12px 32px -14px rgba(18,22,27,.16);
+  --smith-font-display:"Manrope Variable",Manrope,Inter,system-ui,sans-serif;--smith-font-body:"Inter Variable",Inter,system-ui,Roboto,"Segoe UI",sans-serif;
+  --smith-radius-control:12px;--smith-radius-card:22px;--smith-radius-modal:24px;--smith-radius-pill:999px;
+  --smith-motion-fast:120ms;--smith-motion-standard:220ms;--smith-motion-deliberate:300ms;--smith-spring:cubic-bezier(.2,.9,.25,1.04);--smith-bouncy:cubic-bezier(.3,1.4,.5,1);
+  /* Flexsmith: the approved violet #6C5AA2 passes 4.5:1 with white and on the neutral surfaces, so tile and UI accent are one colour in the light theme */
+  --smith-accent:#6c5aa2;--smith-accent-soft:#ece8f6;--smith-on-accent:#fff;--tile:#6c5aa2;
+  --t-prep:#a8620d;--t-mob:#1f6f5c;--t-stat:#4a63a8;--t-roll:#9a4a73;
+}
+[data-smith-theme="dark"]{color-scheme:dark;
+  --smith-bg:#0b0e11;--smith-surface:#161a1f;--smith-surface-muted:#20262d;--smith-surface-elevated:#2a3139;--smith-text:#e9edf1;--smith-text-secondary:#a3adb8;
+  --smith-border-subtle:#2a3139;--smith-border-strong:#6b7580;--smith-positive:#7fd39f;--smith-positive-soft:#16301f;--smith-danger:#ff9a8f;--smith-danger-soft:#43201d;
+  --smith-warning:#f2b866;--smith-warning-soft:#3a2a12;--smith-glass:rgba(20,24,29,.78);--smith-scrim:rgba(0,0,0,.55);
+  --smith-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 12px 32px -14px rgba(0,0,0,.6);
+  --smith-accent:#b3a6e6;--smith-accent-soft:#241f3a;--smith-on-accent:#14102a;
+  --t-prep:#e0a050;--t-mob:#5fc2a8;--t-stat:#8fa6e6;--t-roll:#e08fb8;
+}
+@media (prefers-reduced-motion:reduce){:root{--smith-motion-fast:0ms;--smith-motion-standard:0ms;--smith-motion-deliberate:0ms}}
+html[data-motion="reduce"]{--smith-motion-fast:0ms;--smith-motion-standard:0ms;--smith-motion-deliberate:0ms}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+tests/e2e/out/
+*.jks
+*.keystore
+local.properties
+.DS_Store
+android/app/src/main/assets/
+android/app/build/
+android/build/
+android/.gradle/
+android/capacitor-cordova-android-plugins/
+__pycache__/

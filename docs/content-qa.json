@@ -1,0 +1,649 @@
+{
+ "generatedFrom": "src/content/exercises.ts",
+ "summary": {
+  "exercises": 40,
+  "sessions": 13,
+  "reviewed": 0,
+  "needsReview": 40,
+  "withVerifiedMedia": 0,
+  "withTextFallback": 40
+ },
+ "exercises": [
+  {
+   "id": "march",
+   "type": "dynamic",
+   "area": "full",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "swingfb",
+   "type": "dynamic",
+   "area": "hips",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "swinglat",
+   "type": "dynamic",
+   "area": "hips",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "hipcircles",
+   "type": "dynamic",
+   "area": "hips",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "calfraise",
+   "type": "dynamic",
+   "area": "calves",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "lungerot",
+   "type": "dynamic",
+   "area": "hips",
+   "equip": "none",
+   "level": 2,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "buttkick",
+   "type": "dynamic",
+   "area": "quads",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "inchworm",
+   "type": "dynamic",
+   "area": "hams",
+   "equip": "none",
+   "level": 2,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "armcircles",
+   "type": "dynamic",
+   "area": "shoulders",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "squatprep",
+   "type": "dynamic",
+   "area": "hips",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rocks",
+   "type": "mobility",
+   "area": "ankles",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "anklecircles",
+   "type": "mobility",
+   "area": "ankles",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "openbook",
+   "type": "mobility",
+   "area": "thoracic",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "threadneedle",
+   "type": "mobility",
+   "area": "thoracic",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "h9090",
+   "type": "mobility",
+   "area": "hips",
+   "equip": "mat",
+   "level": 2,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "windshield",
+   "type": "mobility",
+   "area": "hips",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "catcow",
+   "type": "mobility",
+   "area": "thoracic",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "sidebend",
+   "type": "mobility",
+   "area": "thoracic",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "hipflex",
+   "type": "static",
+   "area": "hips",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "calfst",
+   "type": "static",
+   "area": "calves",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "hamst",
+   "type": "static",
+   "area": "hams",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "fig4",
+   "type": "static",
+   "area": "glutes",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "doorway",
+   "type": "static",
+   "area": "shoulders",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "quadst",
+   "type": "static",
+   "area": "quads",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "adductor",
+   "type": "static",
+   "area": "hips",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "childpose",
+   "type": "static",
+   "area": "core",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "crossbody",
+   "type": "static",
+   "area": "shoulders",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "wriststretch",
+   "type": "static",
+   "area": "wrists",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "glutebridge",
+   "type": "control",
+   "area": "glutes",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "wallslide",
+   "type": "control",
+   "area": "shoulders",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "birddog",
+   "type": "control",
+   "area": "core",
+   "equip": "mat",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "tibraise",
+   "type": "control",
+   "area": "ankles",
+   "equip": "none",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "clamshell",
+   "type": "control",
+   "area": "glutes",
+   "equip": "miniband",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "pullapart",
+   "type": "control",
+   "area": "shoulders",
+   "equip": "longband",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollcalf",
+   "type": "roll",
+   "area": "calves",
+   "equip": "roller",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollquad",
+   "type": "roll",
+   "area": "quads",
+   "equip": "roller",
+   "level": 2,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollback",
+   "type": "roll",
+   "area": "thoracic",
+   "equip": "roller",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollglute",
+   "type": "roll",
+   "area": "glutes",
+   "equip": "roller",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollhams",
+   "type": "roll",
+   "area": "hams",
+   "equip": "roller",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  },
+  {
+   "id": "rollfoot",
+   "type": "roll",
+   "area": "feet",
+   "equip": "ball",
+   "level": 1,
+   "status": "needs-review",
+   "sources": [],
+   "mediaAsset": null,
+   "textFallback": true,
+   "note": "Author draft, to be reviewed before it is called verified."
+  }
+ ],
+ "sessions": [
+  {
+   "id": "prerun",
+   "intent": "prep",
+   "steps": [
+    "march",
+    "swingfb",
+    "rocks",
+    "calfraise",
+    "lungerot"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "prestrength",
+   "intent": "prep",
+   "steps": [
+    "march",
+    "h9090",
+    "openbook",
+    "squatprep",
+    "rocks"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "warmfull",
+   "intent": "prep",
+   "steps": [
+    "march",
+    "armcircles",
+    "swingfb",
+    "swinglat",
+    "catcow",
+    "lungerot",
+    "rocks",
+    "calfraise"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "bandprep",
+   "intent": "prep",
+   "steps": [
+    "clamshell",
+    "glutebridge",
+    "pullapart",
+    "birddog"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "postrun",
+   "intent": "wind",
+   "steps": [
+    "calfst",
+    "hipflex",
+    "hamst",
+    "fig4",
+    "quadst"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "poststrength",
+   "intent": "wind",
+   "steps": [
+    "doorway",
+    "quadst",
+    "hamst",
+    "fig4",
+    "crossbody"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "hipmob",
+   "intent": "mob",
+   "steps": [
+    "windshield",
+    "h9090",
+    "hipflex",
+    "lungerot",
+    "fig4"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "ankles",
+   "intent": "mob",
+   "steps": [
+    "anklecircles",
+    "rocks",
+    "tibraise",
+    "calfraise",
+    "calfst"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "shouldthor",
+   "intent": "mob",
+   "steps": [
+    "catcow",
+    "openbook",
+    "threadneedle",
+    "wallslide",
+    "doorway"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "desk",
+   "intent": "gen",
+   "steps": [
+    "march",
+    "doorway",
+    "calfraise",
+    "armcircles"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "gentle",
+   "intent": "gen",
+   "steps": [
+    "catcow",
+    "windshield",
+    "childpose",
+    "adductor",
+    "openbook"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "rolllegs",
+   "intent": "roll",
+   "steps": [
+    "rollcalf",
+    "rollquad",
+    "rollhams",
+    "calfst"
+   ],
+   "status": "needs-review"
+  },
+  {
+   "id": "rollupper",
+   "intent": "roll",
+   "steps": [
+    "rollback",
+    "doorway",
+    "catcow"
+   ],
+   "status": "needs-review"
+  }
+ ]
+}

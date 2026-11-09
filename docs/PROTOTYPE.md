@@ -1,3 +1,5 @@
+> **Prototyp zastąpiony.** Został zbudowany z pierwszą ikoną (figura z kółkiem) i służył do akceptacji kierunku. Prawdziwa aplikacja (`src/`) używa zatwierdzonego logo wariantu 2. Prototyp zostaje jako historia i nie jest utrzymywany. Plik kopii wyeksportowany z prototypu da się wczytać do aplikacji (konwersja w `src/storage/backup.ts`).
+
 # Prototyp wizualny do akceptacji
 
 Plik: `prototype/flexsmith-prototype.html` (jeden plik, fonty osadzone, bez sieci).
