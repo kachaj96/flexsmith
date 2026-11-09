@@ -14,7 +14,7 @@ import { PART_PATHS, RADIUS, TILE } from '../brand-art';
 const MARK = `<rect width="1024" height="1024" rx="${RADIUS}" fill="${TILE}"/>${PART_PATHS.map(d => `<path fill="#fff" d="${d}"/>`).join('')}`;
 const GLYPH = PART_PATHS.map(d => `<path fill="var(--smith-accent)" d="${d}"/>`).join('');
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';
 const NAV: [string, Key][] = [['today', 'nav.today'], ['sessions', 'nav.sessions'], ['mine', 'nav.mine'], ['lib', 'nav.lib'], ['more', 'nav.more']];
 const INTENTS: Intent[] = ['prep', 'wind', 'mob', 'roll', 'gen'];
 const TYPES: ExType[] = ['dynamic', 'mobility', 'static', 'control', 'roll'];
@@ -184,10 +184,10 @@ export function pageOnboarding(): string {
   const goal = `<h2>${t('ob.goal')}</h2><div class="seg">${INTENTS.map(k => chip(t(`intent.${k}` as Key), d.goal === k, 'obGoal', k)).join('')}</div>`;
   const time = `<h2>${t('ob.time')}</h2><div class="seg">${[5, 10, 15, 20, 30].map(m => chip(t('ob.minutes', { n: m }), d.timeMin === m, 'obTime', String(m))).join('')}</div><label class="cap" for="obCustom">${t('ob.custom')}</label><input class="field num" id="obCustom" type="number" inputmode="numeric" min="1" max="120" value="${[5, 10, 15, 20, 30].includes(d.timeMin) ? '' : d.timeMin}">`;
   const equip = `<h2>${t('ob.equip')}</h2><p class="cap">${t('ob.equipNote')}</p><div class="seg">${EQUIPS.map(k => chip(equipName(k), d.equip.includes(k), 'obEquip', k)).join('')}</div>`;
-  const level = `<h2>${t('ob.level')}</h2><div class="seg">${(['new', 'regular', 'experienced'] as const).map(k => chip(t(`level.${k}` as Key), d.level === k, 'obLevel', k)).join('')}</div>`;
+  const level = `<h2>${t('ob.level')}</h2><div role="group">${(['new', 'regular', 'experienced'] as const).map(k => `<button class="choice" aria-pressed="${d.level === k}" data-a="obLevel" data-id="${k}"><b>${t(`level.${k}` as Key)}</b><span>${t(`level.desc.${k}` as Key)}</span></button>`).join('')}</div>`;
   const focus = `<h2>${t('ob.focus')}</h2><p class="cap">${t('ob.focusNote')}</p><div class="seg">${AREAS.filter(a => a !== 'full').map(k => chip(areaName(k), d.focus.includes(k), 'obFocus', k)).join('')}</div>`;
   const limits = `<h2>${t('ob.limits')}</h2><p class="cap">${t('ob.limitsNote')}</p><div class="seg">${LIMITS.map(k => chip(t(`limit.${k}` as Key), d.limits.includes(k), 'obLimit', k)).join('')}</div>
-    <div class="notice" style="margin-top:8px">${ico('warn')}<div><button class="chip" role="switch" aria-checked="${d.redFlag}" aria-pressed="${d.redFlag}" data-a="obRed">${t('ob.redflag')}</button><p class="cap" style="margin:8px 0 0">${t('ob.redflagNote')}</p></div></div>`;
+    <h2 style="margin-top:20px">${t('ob.redTitle')}</h2><button class="toggle-wide" role="checkbox" aria-checked="${d.redFlag}" data-a="obRed" data-testid="ob-red"><span class="box" aria-hidden="true">${d.redFlag ? '✓' : ''}</span><span>${t('ob.redflag')}</span></button><p class="cap" style="margin:8px 0 0">${t('ob.redflagNote')}</p>`;
   const body = [goal, time, equip, level, focus, limits][i];
   return `<div class="hdr" style="padding:max(8px,env(safe-area-inset-top)) 16px 0"><b class="grow" style="font:800 20px var(--smith-font-display)">${t('ob.title')}</b><button class="btn ghost" data-a="obSkip">${t('ob.skip')}</button></div><div class="scroll">
   <div class="ob-dots" aria-hidden="true">${Array.from({ length: OB_STEPS }, (_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div><p class="cap">${t('ob.step', { i: i + 1, n: OB_STEPS })}</p>${body}

@@ -1,6 +1,6 @@
 {
   "name": "flexsmith",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "description": "Flexsmith: mobilność, przygotowanie do ruchu, rozciąganie i opcjonalne rolowanie. Offline, dane lokalnie.",

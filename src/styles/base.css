@@ -58,7 +58,7 @@ h2{font:700 18px/1.3 var(--smith-font-display);margin:24px 0 10px}
 .progress{height:8px;border-radius:99px;background:var(--smith-surface-muted);overflow:hidden}
 .progress>i{display:block;height:100%;width:0;background:var(--smith-accent);border-radius:99px;transition:width var(--smith-motion-standard) linear}
 /* ===== bottom nav ===== */
-.nav{position:absolute;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--smith-glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--smith-border-subtle)}
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:10;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--smith-glass);-webkit-backdrop-filter:blur(20px) saturate(1.8);backdrop-filter:blur(20px) saturate(1.8);border-top:1px solid var(--smith-border-subtle)}
 .nav button{position:relative;min-height:56px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:500 12px var(--smith-font-body);color:var(--smith-text-secondary);z-index:0}
 .nav button[aria-current="page"]{color:var(--smith-accent);font-weight:700}
 .nav .pill{position:absolute;left:0;top:8px;height:56px;border-radius:18px;background:var(--smith-accent-soft);z-index:-1;transition:transform var(--smith-motion-deliberate) var(--smith-spring),width var(--smith-motion-deliberate) var(--smith-spring);pointer-events:none}
@@ -109,7 +109,7 @@ ol.steps{margin:0;padding-left:22px}ol.steps li{margin:6px 0}
 .ring .val b{font:800 46px/1 var(--smith-font-display);font-variant-numeric:tabular-nums}
 .ring .val span{font-size:13px;color:var(--smith-text-secondary)}
 .side{align-self:center;min-height:36px;padding:0 16px;border-radius:99px;background:var(--smith-accent-soft);color:var(--smith-accent);font:800 15px var(--smith-font-display);display:inline-flex;align-items:center}
-.ctl{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center;gap:12px;margin-top:8px}
+.ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-top:8px}
 .ctl .big{width:84px;height:84px;border-radius:50%;background:var(--smith-accent);color:var(--smith-on-accent);display:grid;place-items:center;transition:transform var(--smith-motion-fast) var(--smith-spring)}
 .ctl .big:active{transform:scale(.94)}
 .ctl .big svg{width:34px;height:34px;fill:currentColor;stroke:none}
@@ -131,3 +131,14 @@ html[data-motion="reduce"] .check circle,html[data-motion="reduce"] .check path{
 .ob-dots{display:flex;gap:6px;justify-content:center;margin:6px 0 14px}.ob-dots i{width:22px;height:5px;border-radius:9px;background:var(--smith-surface-elevated)}.ob-dots i.on{background:var(--smith-accent)}
 .fade-in{animation:rise var(--smith-motion-standard) var(--smith-spring) both}
 .legend{display:none}
+.ctl .big.start{width:auto;min-width:84px;border-radius:42px;padding:0 22px;display:flex;gap:6px;font:800 17px var(--smith-font-display)}
+.ctl .big.start svg{width:26px;height:26px}
+/* a toggle with a long label: wraps, full width, still a 44 px target */
+.toggle-wide{width:100%;min-height:48px;padding:12px 14px;border-radius:14px;display:flex;align-items:flex-start;gap:12px;text-align:left;white-space:normal;background:var(--smith-surface);box-shadow:inset 0 0 0 1.5px var(--smith-border-strong);font:600 15px/1.35 var(--smith-font-body)}
+.toggle-wide[aria-checked="true"]{box-shadow:inset 0 0 0 2px var(--smith-accent);background:var(--smith-accent-soft)}
+.toggle-wide .box{flex:none;width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--smith-border-strong);display:grid;place-items:center;margin-top:1px}
+.toggle-wide[aria-checked="true"] .box{background:var(--smith-accent);box-shadow:none;color:var(--smith-on-accent)}
+.choice{width:100%;text-align:left;display:block;padding:12px 14px;margin-bottom:8px;border-radius:16px;background:var(--smith-surface);box-shadow:inset 0 0 0 1.5px var(--smith-border-subtle);min-height:56px}
+.choice[aria-pressed="true"]{background:var(--smith-accent-soft);box-shadow:inset 0 0 0 2px var(--smith-accent)}
+.choice b{display:block;font:700 16px var(--smith-font-display)}.choice span{display:block;font-size:14px;line-height:20px;color:var(--smith-text-secondary);margin-top:2px}
+.page.still,.sheet.still{animation:none}

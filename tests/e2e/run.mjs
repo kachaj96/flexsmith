@@ -178,6 +178,9 @@ for (const scheme of ['light', 'dark']) {
 {
   const { ctx, page, errors } = await open(PH);
   await page.click('[data-a=startRec]'); await page.waitForSelector('#player'); await page.waitForTimeout(400); await shot(page, 'player-light');
+  const r0 = +(await page.locator('[data-testid=pl-time]').innerText()); await page.waitForTimeout(1300);
+  check('player: a timed exercise waits for Start, with a hint to read the instruction, and nothing counts', await page.locator('[data-testid=pl-start]').count() === 1 && await page.locator('[data-testid=pl-ready]').count() === 1 && +(await page.locator('[data-testid=pl-time]').innerText()) === r0);
+  await page.click('[data-testid=pl-start]');
   const l1 = +(await page.locator('[data-testid=pl-time]').innerText()); await page.waitForTimeout(1300); const l2 = +(await page.locator('[data-testid=pl-time]').innerText());
   check('player: the timer counts down', l2 < l1, `${l1}->${l2}`);
   await page.click('[data-testid=pl-pause]'); const lp = +(await page.locator('[data-testid=pl-time]').innerText()); await page.waitForTimeout(1300); check('player: pause holds the value', +(await page.locator('[data-testid=pl-time]').innerText()) === lp);
@@ -206,8 +209,10 @@ for (const scheme of ['light', 'dark']) {
   const { ctx, page } = await open(PH);
   await shortRoutine(page, 'swingfb'); await page.click('[data-a=editRoutine] >> nth=0'); await page.click('[data-a=startSession]'); await page.waitForSelector('#player');
   check('player: a two-sided exercise starts with the left side', (await page.locator('[data-testid=pl-side]').innerText()).includes('Lewa'));
+  await page.click('[data-testid=pl-start]');
   await page.waitForFunction(() => document.querySelector('[data-testid=pl-side]')?.textContent?.includes('Prawa'), null, { timeout: 9000 });
-  check('player: the side changes automatically to the right side', true);
+  check('player: after the left side the right side comes up and waits for Start', await page.locator('[data-testid=pl-start]').count() === 1);
+  await page.click('[data-testid=pl-start]');
   await page.waitForSelector('[data-testid=pl-result]', { timeout: 9000 });
   check('player: after the last side the session is complete', (await page.locator('[data-testid=pl-result]').innerText()).includes('zakończona'));
   const act = await page.locator('[data-testid=pl-actual]').innerText(); check('player: the actual duration is about the planned 10 s (0:09 to 0:11)', ['0:09', '0:10', '0:11'].includes(act), act);
@@ -231,6 +236,60 @@ for (const scheme of ['light', 'dark']) {
   await page.click('[data-a=resumeSaved]'); await page.waitForSelector('#player'); check('resuming starts paused on the saved step', (await page.locator('[data-testid=pl-step]').innerText()).includes('2 z') && (await text(page)).includes('Wznowiono po przerwie'));
   await page.click('[data-testid=pl-finish]'); await page.click('[data-testid=pl-save]'); await page.waitForSelector('[data-testid=hist-row]'); check('the unfinished-session record is cleared after saving', await page.locator('[data-testid=resume-card]').count() === 0);
   await ctx.close();
+}
+
+{ // leaving the summary with the back button saves the session and never offers it for resuming (this used to freeze the player)
+  const { ctx, page } = await open(PH);
+  await page.click('[data-a=startRec]'); await page.waitForSelector('#player'); await page.click('[data-testid=pl-finish]'); await page.waitForSelector('[data-testid=pl-result]');
+  await page.evaluate(() => { const b = document.createElement('button'); b.dataset.a = 'plMin'; document.getElementById('player').append(b); b.click(); });
+  await page.waitForSelector('#player', { state: 'detached' });
+  check('back on the summary: the session is saved and not offered for resuming', await page.locator('[data-testid=resume-card]').count() === 0 && (await hist(page)).length === 1);
+  await page.click('[data-testid=nav-more]'); await page.click('[data-testid=nav-today]');
+  check('back on the summary: going to the menu and back shows no stale session', await page.locator('[data-testid=resume-card]').count() === 0);
+  await ctx.close();
+}
+{ // menu and back during a session, several times
+  const { ctx, page } = await open(PH);
+  await page.click('[data-a=startRec]'); await page.waitForSelector('#player'); await page.click('[data-testid=pl-start]');
+  for (let k = 0; k < 3; k++) {
+    await page.click('[data-testid=pl-min]'); await page.waitForSelector('[data-testid=resume-card]'); await page.click('[data-testid=nav-more]'); await page.click('[data-testid=nav-today]');
+    await page.click('[data-a=resumeSaved]'); await page.waitForSelector('#player');
+  }
+  await page.click('[data-testid=pl-start]'); const a = +(await page.locator('[data-testid=pl-time]').innerText()); await page.waitForTimeout(1300);
+  check('menu and back three times: the player still responds and counts after Start', +(await page.locator('[data-testid=pl-time]').innerText()) < a);
+  await page.click('[data-testid=pl-next]'); await page.waitForTimeout(250); check('menu and back: next still works', (await page.locator('[data-testid=pl-step]').innerText()).includes('2 z'));
+  await ctx.close();
+}
+{ // the countdown sound: the last 5 seconds rise gently, then the end cue (Web Audio replaced by a recorder)
+  const REC = () => { window.__tones = []; class O { constructor() { this.frequency = { value: 0 }; } connect() {} start() { window.__tones.push(this.frequency.value); } stop() {} }
+    class G { constructor() { this.gain = { setValueAtTime() {}, exponentialRampToValueAtTime() {} }; } connect() {} }
+    window.AudioContext = class { constructor() { this.state = 'running'; this.currentTime = 0; this.destination = {}; } resume() { return Promise.resolve(); } createOscillator() { return new O(); } createGain() { return new G(); } }; };
+  const { ctx, page } = await open(PH, REC);
+  await page.click('[data-testid=nav-more]'); await page.click('[data-a=togPref][data-k=sound]'); await page.waitForFunction(() => document.querySelector('[data-a=togPref][data-k=sound]').getAttribute('aria-pressed') === 'true');
+  await shortRoutine(page, 'march'); await page.click('[data-a=editRoutine] >> nth=0'); await page.click('[data-a=startSession]'); await page.click('[data-testid=pl-start]');
+  await page.waitForSelector('[data-testid=pl-result]', { timeout: 9000 });
+  const tones = await page.evaluate(() => window.__tones);
+  const count = tones.slice(0, 5); const rising = count.every((f, i) => i === 0 || f > count[i - 1]);
+  check('sound: five countdown tones for 5..1 s, each a little higher, then a two-note end cue', tones.length === 7 && rising && tones[5] > count[4] - 1, tones.join(','));
+  await ctx.close();
+}
+{ // tapping a choice in the preferences does not flash the screen underneath
+  const { ctx, page } = await open(PH);
+  await page.click('[data-testid=nav-more]'); await page.click('[data-a=openOb]'); await page.waitForTimeout(400);
+  await page.click('[data-a=obGoal][data-id=mob]');
+  const st = await page.evaluate(() => ({ cls: document.querySelector('.page').className, anim: getComputedStyle(document.querySelector('.page')).animationName, op: getComputedStyle(document.querySelector('.page')).opacity }));
+  check('preferences: a tapped choice redraws in place (no entrance animation, fully opaque)', st.cls.includes('still') && st.anim === 'none' && st.op === '1', JSON.stringify(st));
+  await page.click('[data-a=obNext]'); await page.click('[data-a=obNext]'); await page.click('[data-a=obNext]');
+  check('preferences: every level has a short description', (await page.locator('.choice span').count()) === 3 && (await page.locator('.choice').first().innerText()).includes('najprostsze'));
+  await page.click('[data-a=obNext]'); await page.click('[data-a=obNext]');
+  const rf = await page.evaluate(() => { const b = document.querySelector('[data-testid=ob-red]').getBoundingClientRect(), s = document.querySelector('[data-testid=ob-red] span:last-child').getBoundingClientRect(); return { inside: s.right <= b.right + 0.5 && s.left >= b.left, fits: b.right <= innerWidth }; });
+  check('preferences: the warning-sign option keeps its text inside its box', rf.inside && rf.fits, JSON.stringify(rf));
+  await ctx.close();
+}
+{ // the bottom bar blurs what scrolls under it, as in Runsmith and Repsmith
+  const { ctx, page } = await open(PH);
+  const bf = await page.evaluate(() => getComputedStyle(document.querySelector('.nav')).backdropFilter);
+  check('nav: backdrop blur is applied (the minifier must not drop the standard property)', /blur/.test(bf), bf); await ctx.close();
 }
 
 /* ================= backup ================= */
@@ -268,7 +327,7 @@ for (const [w, h] of [[320, 568], [360, 740], [390, 844], [430, 932], [768, 1024
   check(`[${w}x${h}] touch targets are at least 44 px`, small.length === 0, small.slice(0, 5).join(', '));
   await page.click('[data-testid=nav-today]'); await page.click('[data-a=startRec]'); await page.waitForSelector('#player');
   const fits = await page.evaluate(() => { const p = document.getElementById('player'); return p.scrollWidth <= p.clientWidth + 1; });
-  const btnVisible = await page.evaluate(() => { const b = document.querySelector('[data-testid=pl-pause]').getBoundingClientRect(); return b.bottom <= innerHeight && b.top >= 0; });
+  const btnVisible = await page.evaluate(() => { const b = document.querySelector('.ctl .big').getBoundingClientRect(); return b.bottom <= innerHeight && b.top >= 0; });
   check(`[${w}x${h}] the player fits and its main control is on screen`, fits && btnVisible);
   await ctx.close();
 }

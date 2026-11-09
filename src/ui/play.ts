@@ -1,6 +1,7 @@
 import { exerciseById } from '../content/exercises';
 import type { StepLike } from '../domain/estimate';
-import { adjust, back, complete, createPlayer, finish, msLeft, pause, restore, resume, skip, swap, tick, toInstance, type Clock, type PlayerState } from '../domain/player';
+import { adjust, back, complete, createPlayer, finish, msLeft, pause, restore, resume, skip, start, swap, tick, toInstance, type Clock, type PlayerState } from '../domain/player';
+import { countdownTick, endChime, unlockAudio } from './audio';
 import { alternativesFor } from '../domain/recommend';
 import { newId } from '../domain/routine';
 import { loc, locList, t, type Key } from '../i18n';
@@ -11,7 +12,7 @@ import { ExTypeTag } from './tags';
 
 /* The guided player UI. All timing lives in domain/player.ts (pure, tested): this file only feeds it the two clocks from rAF,
    visibilitychange and every action, draws the state, and saves a snapshot at every change of phase or status. */
-interface Ctl { s: PlayerState; raf: number; anim: boolean; swaps: number; lock: WakeLockSentinel | null; notice: string; saveErr: boolean }
+interface Ctl { s: PlayerState; raf: number; anim: boolean; swaps: number; lock: WakeLockSentinel | null; notice: string; saveErr: boolean; lastTick: number; saving?: boolean }
 let ctl: Ctl | null = null;
 let hooks: { onClose: () => void; toast: (m: string) => void } = { onClose: () => undefined, toast: () => undefined };
 export const setPlayHooks = (h: typeof hooks): void => { hooks = h; };
@@ -27,24 +28,25 @@ async function lock(on: boolean): Promise<void> {
     if (!on && ctl?.lock) { await ctl.lock.release(); ctl.lock = null; }
   } catch { /* not available or refused: the session works without it */ }
 }
+/** The end of a timed exercise: a soft chime and a short vibration, each only when switched on. */
 function cue(): void {
   if (store.prefs.haptic && navigator.vibrate) navigator.vibrate(60);
-  if (store.prefs.sound) { try { const A = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext; const a = new A(); const o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); g.gain.value = 0.04; o.frequency.value = 660; o.start(); o.stop(a.currentTime + 0.12); } catch { /* no audio */ } }
+  if (store.prefs.sound) endChime();
 }
 
 export function startPlay(source: { kind: 'template' | 'custom'; id: string }, name: string, steps: StepLike[]): boolean {
   const s = createPlayer(source, name, steps, clock()); if (!s) return false;
-  ctl = { s, raf: 0, anim: true, swaps: 0, lock: null, notice: '', saveErr: false }; store.saved = null; persist(); void lock(true); draw(); loop(); return true;
+  ctl = { s, raf: 0, anim: true, swaps: 0, lock: null, notice: '', saveErr: false, lastTick: 0 }; store.saved = null; persist(); void lock(true); if (store.prefs.sound) unlockAudio(); draw(); loop(); return true;
 }
 export function resumeSaved(): boolean {
-  const snap = store.saved; if (!snap) return false;
-  ctl = { s: restore(snap, clock()), raf: 0, anim: true, swaps: 0, lock: null, notice: t('pl.resumed'), saveErr: false }; store.saved = null; draw(); loop(); return true;
+  const snap = store.saved; if (!snap || snap.status === 'finished') { store.saved = null; return false; }
+  ctl = { s: restore(snap, clock()), raf: 0, anim: true, swaps: 0, lock: null, notice: t('pl.resumed'), saveErr: false, lastTick: 0 }; store.saved = null; draw(); loop(); return true;
 }
 
 function apply(next: PlayerState, opts: { redraw?: boolean } = {}): void {
   if (!ctl) return; const before = ctl.s; ctl.s = next;
-  const phaseChanged = next.i !== before.i || next.status !== before.status; const auto = phaseChanged && next.status === 'running' && next.i > before.i;
-  if (phaseChanged) { ctl.anim = true; ctl.notice = ''; if (auto) cue(); persist(); if (next.status === 'finished') { cancelAnimationFrame(ctl.raf); void lock(false); drawFinish(); return; } }
+  const phaseChanged = next.i !== before.i || next.status !== before.status; const auto = phaseChanged && before.status === 'running' && before.phases[before.i]!.mode === 'time' && (next.i > before.i || next.status === 'finished') && before.remainingMs <= 1000;
+  if (phaseChanged) { if (next.i !== before.i) { ctl.anim = true; ctl.lastTick = 0; } ctl.notice = next.i !== before.i ? '' : ctl.notice; if (auto) cue(); persist(); if (next.status === 'finished') { cancelAnimationFrame(ctl.raf); void lock(false); drawFinish(); return; } }
   if (opts.redraw || phaseChanged) draw(); else paint();
 }
 function loop(): void { if (!ctl) return; cancelAnimationFrame(ctl.raf); ctl.raf = requestAnimationFrame(() => { if (!ctl || ctl.s.status === 'finished') return; apply(tick(ctl.s, clock())); loop(); }); }
@@ -58,7 +60,9 @@ export function onVisibility(): void {
 const sideLabel = (side: 'L' | 'R' | null): string => (side === 'L' ? t('pl.left') : side === 'R' ? t('pl.right') : '');
 function paint(): void {
   if (!ctl) return; const p = ctl.s.phases[ctl.s.i]!; if (p.mode !== 'time') return;
-  const l = msLeft(ctl.s, clock()) / 1000; const tl = document.getElementById('tl'); if (tl) tl.textContent = String(Math.ceil(l));
+  const l = msLeft(ctl.s, clock()) / 1000; const sec = Math.ceil(l); const tl = document.getElementById('tl'); if (tl) tl.textContent = String(sec);
+  // the last five seconds, once per second, only while the countdown runs
+  if (ctl.s.status === 'running' && sec >= 1 && sec <= 5 && sec !== ctl.lastTick) { ctl.lastTick = sec; if (store.prefs.sound) countdownTick(sec); }
   const fg = document.getElementById('rfg'); if (fg) fg.setAttribute('stroke-dashoffset', (490.1 * (1 - l / Math.max(1, p.val))).toFixed(1));
 }
 function draw(): void {
@@ -70,6 +74,7 @@ function draw(): void {
   <div class="pl-body"><div class="${ctl.anim ? 'pl-step' : ''}" style="display:flex;flex-direction:column;gap:12px">
     <div style="text-align:center;margin-top:10px">${ExTypeTag(e.type)}<h1 style="font-size:26px;margin:8px 0 0" data-testid="pl-name">${esc(loc(e.name))}</h1></div>
     ${p.side ? `<span class="side" data-testid="pl-side">${t('pl.side')}: ${sideLabel(p.side)}</span>` : ''}
+    ${s.status === 'ready' ? `<p class="cap" style="text-align:center;margin:0" data-testid="pl-ready">${t('pl.readyHint')}</p>` : ''}
     ${ctl.notice ? `<div class="notice info">${ico('info')}<div>${esc(ctl.notice)}</div></div>` : ''}
     ${p.mode === 'time' ? `<div class="ring" role="timer"><svg viewBox="0 0 176 176" aria-hidden="true"><circle class="bg" cx="88" cy="88" r="78"/><circle class="fg" id="rfg" cx="88" cy="88" r="78" stroke-dasharray="490.1" stroke-dashoffset="0"/></svg><div class="val"><b id="tl" data-testid="pl-time">${Math.ceil(msLeft(s, clock()) / 1000)}</b><span>${t('pl.secLeft')}</span></div></div>`
       : `<div class="ring"><svg viewBox="0 0 176 176" aria-hidden="true"><circle class="bg" cx="88" cy="88" r="78"/></svg><div class="val"><b data-testid="pl-reps">${p.val}</b><span>${t('pl.repsTarget')}</span></div></div>`}
@@ -77,7 +82,8 @@ function draw(): void {
     ${nx ? `<div class="cap" style="text-align:center">${t('pl.nextUp')}: <b>${esc(loc(nx.name))}${next!.side ? ' · ' + sideLabel(next!.side) : ''}</b></div>` : ''}
   </div></div>
   <div class="ctl"><button class="sidebtn" data-a="plPrev" aria-label="${t('pl.prev')}" data-testid="pl-prev">${ico('skipb')}${t('pl.prev')}</button>
-    ${p.mode === 'time' ? `<button class="big" data-a="plPause" aria-label="${running ? t('pl.pause') : t('pl.resume')}" data-testid="pl-pause">${running ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>'}</button>`
+    ${p.mode === 'time' ? (s.status === 'ready' ? `<button class="big start" data-a="plStart" aria-label="${t('pl.start')}" data-testid="pl-start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg><span>${t('pl.start')}</span></button>`
+      : `<button class="big" data-a="plPause" aria-label="${running ? t('pl.pause') : t('pl.resume')}" data-testid="pl-pause">${running ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>'}</button>`)
       : `<button class="big" data-a="plDone" aria-label="${t('pl.done')}" data-testid="pl-done"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`}
     <button class="sidebtn" data-a="plNext" aria-label="${t('pl.next')}" data-testid="pl-next">${t('pl.next')}${ico('skip')}</button></div>
   <div class="ctl2"><button class="btn sec" data-a="plAdj" data-d="-${p.mode === 'time' ? 10 : 1}" aria-label="${t('pl.adjust')}">−${p.mode === 'time' ? '10 ' + t('common.sec') : '1'}</button><button class="btn sec" data-a="plAdj" data-d="${p.mode === 'time' ? 10 : 1}" aria-label="${t('pl.adjust')}">+${p.mode === 'time' ? '10 ' + t('common.sec') : '1'}</button><button class="btn sec" data-a="plSwap" data-testid="pl-swap">${ico('swap')}${t('pl.swap')}</button><button class="btn ghost" data-a="plFinish" data-testid="pl-finish">${t('pl.finish')}</button></div>
@@ -101,7 +107,8 @@ const fmt = (sec: number): string => `${Math.floor(sec / 60)}:${String(Math.roun
 export function playAction(a: string, el: HTMLElement): boolean {
   if (!ctl) return false; const now = clock(); const s = ctl.s;
   switch (a) {
-    case 'plPause': apply(s.status === 'running' ? pause(s, now) : resume(s, now), { redraw: true }); persist(); void lock(ctl.s.status === 'running'); return true;
+    case 'plStart': if (store.prefs.sound) unlockAudio(); apply(start(s, now), { redraw: true }); persist(); void lock(true); return true;
+    case 'plPause': if (store.prefs.sound) unlockAudio(); apply(s.status === 'running' ? pause(s, now) : s.status === 'ready' ? start(s, now) : resume(s, now), { redraw: true }); persist(); void lock(ctl.s.status === 'running'); return true;
     case 'plNext': apply(skip(s, now)); return true;
     case 'plDone': apply(complete(s, now)); return true;
     case 'plPrev': apply(back(s, now), { redraw: true }); ctl.anim = true; persist(); return true;
@@ -113,18 +120,22 @@ export function playAction(a: string, el: HTMLElement): boolean {
       const pick = alts[ctl.swaps++ % alts.length]!; apply(swap(s, pick.id, now), { redraw: true }); persist(); hooks.toast(t('pl.swapped', { n: loc(pick.name) })); return true;
     }
     case 'plFinish': apply(finish(s, now)); if (ctl.s.status !== 'finished') { /* already handled */ } return true;
-    case 'plMin': { const sn = pause(s, now); ctl.s = sn; void saveActive(store.db, sn); store.saved = sn; close(); hooks.onClose(); return true; }
+    case 'plMin': {
+      // leaving the summary screen (back button) saves the finished session without a check-in, it is never offered for "resuming"
+      if (s.status === 'finished') { void savePlay(); return true; }
+      const sn = pause(s, now); ctl.s = sn; void saveActive(store.db, sn).catch(() => undefined); store.saved = sn; close(); hooks.onClose(); return true;
+    }
     case 'plCmf': { document.querySelectorAll<HTMLElement>('#cm .chip').forEach(b => b.setAttribute('aria-pressed', b === el ? 'true' : 'false')); const d = document.getElementById('discomfort'); if (d) d.hidden = el.dataset.id !== 'discomfort'; return true; }
     case 'plSave': { void savePlay(); return true; }
   }
   return false;
 }
 async function savePlay(): Promise<void> {
-  if (!ctl) return; const sel = document.querySelector<HTMLElement>('#cm .chip[aria-pressed="true"]'); const note = (document.getElementById('nt') as HTMLInputElement | null)?.value.trim() ?? '';
+  if (!ctl || ctl.saving) return; ctl.saving = true; const sel = document.querySelector<HTMLElement>('#cm .chip[aria-pressed="true"]'); const note = (document.getElementById('nt') as HTMLInputElement | null)?.value.trim() ?? '';
   const inst = toInstance(ctl.s, newId('h')); const comfort = (sel?.dataset.id as 'ok' | 'strong' | 'discomfort' | undefined) ?? null;
   inst.checkIn = { comfort, note, modified: ctl.s.modified || ctl.s.results.some(r => !!r.swappedFrom) };
   try { await put(store.db, 'history', inst); store.history = [inst, ...store.history]; await saveActive(store.db, null); store.saved = null; }
-  catch { hooks.toast(t('bk.err.write')); return; }
+  catch { if (ctl) ctl.saving = false; hooks.toast(t('bk.err.write')); return; }
   close(); hooks.onClose();
 }
 function close(): void { if (!ctl) return; cancelAnimationFrame(ctl.raf); void lock(false); ctl = null; document.getElementById('player')?.remove(); }
